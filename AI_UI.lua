@@ -182,7 +182,7 @@ end
 
 -- ===== gui parent =====
 local function guiParent()
-	local c = Config.Caps
+	local c = Config.Caps or {}
 	if c.gethui then
 		local ok, h = pcall(c.gethui)
 		if ok and h then return h end
@@ -281,7 +281,7 @@ local function codeBlock(parent, seg, lo)
 	pad(body, 12, 0, 12, 12)
 	local sel
 	btn.MouseButton1Click:Connect(function()
-		local clip = Config.Caps.clip
+		local clip = (Config.Caps or {}).clip or (type(setclipboard) == "function" and setclipboard) or (type(toclipboard) == "function" and toclipboard) or nil
 		if clip then
 			btn.Text = (pcall(clip, seg.v)) and "Copied" or "Copy failed"
 		else
