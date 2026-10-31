@@ -466,6 +466,181 @@ for word in s:gmatch("%a+") do print(word) end]=]),
 	end
 	return nil
 end]=]),
+
+	-- ===================== ROBLOX LUA (extended) =====================
+	E("rbx_client_server", "luau", "Client vs server and script types",
+		"client server localscript script modulescript runcontext filtering enabled replication authority playergui serverscriptservice replicatedstorage serverstorage where run difference",
+		[=[Roblox is client-server. The server owns the authoritative game state; each player's client simulates their own input and character and receives replicated state.
+
+- **Script** (server): runs in Workspace or ServerScriptService; can use DataStores and is the place to trust.
+- **LocalScript** (client): runs for one player (PlayerGui, PlayerScripts, their Character, or Script with RunContext = Client). It can only change things for that client; changes to server-owned objects do not replicate unless the server allows it.
+- **ModuleScript**: shared code returned by `require`; it runs in the context of whoever requires it.
+- Storage: ServerScriptService / ServerStorage are server-only; ReplicatedStorage is visible to both; StarterGui / StarterPlayerScripts are copied to each player.
+Rule of thumb: the client is for input and visuals, the server is for rules, rewards, damage and saving.]=],
+		nil),
+
+	E("rbx_remotes", "luau", "RemoteEvents and RemoteFunctions",
+		"remote remoteevent remotefunction fireserver onserverevent fireclient invokeserver onserverinvoke communicate client server bindableevent send message arguments",
+		[=[RemoteEvents send one-way messages between client and server; RemoteFunctions wait for a reply. Client -> server: `remote:FireServer(args)`, received with `remote.OnServerEvent:Connect(function(player, args) ... end)` (the engine adds `player` as the first argument and it can't be faked). Server -> client: `remote:FireClient(player, args)` / `FireAllClients`, received with `OnClientEvent`.
+
+Never use a RemoteFunction's client side to answer the server (a client can stall or error it). For same-side messaging use BindableEvents. Treat every argument from a client as untrusted input: check its type, range and that the action is allowed right now (see the validation entry).]=],
+		[=[-- server
+local remote = game.ReplicatedStorage.BuyItem
+remote.OnServerEvent:Connect(function(player, itemId)
+	if typeof(itemId) ~= "string" then return end
+	-- validate, charge, grant on the server only
+end)
+
+-- client
+game.ReplicatedStorage.BuyItem:FireServer("Sword")]=]),
+
+	E("rbx_runservice", "luau", "RunService events: Heartbeat, Stepped, RenderStepped",
+		"runservice heartbeat stepped renderstepped presimulation postsimulation frame loop every frame deltatime dt bindtorenderstep update",
+		[=[RunService gives per-frame hooks. `Heartbeat` (PostSimulation) fires every frame after physics and passes `dt`; `Stepped` (PreSimulation) fires before physics; `RenderStepped` (client only) fires before the frame is drawn, so use it only for camera/visual work that must not lag. Use dt to keep speed frame-rate independent, keep the callbacks small, and disconnect connections you no longer need. For waiting use `task.wait()`, not `wait()`.]=],
+		[=[local RunService = game:GetService("RunService")
+local conn = RunService.Heartbeat:Connect(function(dt)
+	part.CFrame = part.CFrame * CFrame.Angles(0, dt * 2, 0)
+end)
+-- later: conn:Disconnect()]=]),
+
+	E("rbx_types", "luau", "Luau type annotations and strict mode",
+		"type types annotation strict nonstrict typecheck optional generic export type string number any union parameter return annotate",
+		[=[Luau supports optional types. Start a file with `--!strict` to get full type checking in Studio. Annotate variables `local n: number = 1`, parameters and returns `function f(a: string): boolean`, optionals `string?`, unions `string | number`, tables `{ [string]: number }` or arrays `{ number }`. Define your own with `type Point = { x: number, y: number }` and share with `export type`. Types are erased at runtime, so they catch bugs early without costing performance.]=],
+		[=[--!strict
+type Item = { name: string, price: number, tags: { string }? }
+
+local function describe(item: Item): string
+	return item.name .. " costs " .. item.price
+end]=]),
+
+	E("rbx_raycast", "luau", "Raycasting with RaycastParams",
+		"raycast ray workspace raycastparams filter whitelist blacklist exclude include hit position normal instance line of sight detect",
+		[=[`workspace:Raycast(origin, direction, params)` returns a RaycastResult (Instance, Position, Normal, Material) or nil. `direction` is a vector, not a point (multiply a unit direction by the distance). Build RaycastParams with `FilterType = Enum.RaycastFilterType.Exclude` (or Include) and `FilterDescendantsInstances = {...}`, and always handle the nil case.]=],
+		[=[local params = RaycastParams.new()
+params.FilterType = Enum.RaycastFilterType.Exclude
+params.FilterDescendantsInstances = { character }
+
+local result = workspace:Raycast(origin, direction * 100, params)
+if result then
+	print(result.Instance, result.Position)
+end]=]),
+
+	E("rbx_datastore", "luau", "DataStores: saving data safely (server only)",
+		"datastore datastoreservice save load persist data getasync setasync updateasync pcall retry throttle player data leave bindtoclose",
+		[=[DataStores work only on the server and can fail, so wrap calls in pcall and retry with a short wait. Prefer `UpdateAsync` over Get-then-Set to avoid overwriting newer data, save when a player leaves (`Players.PlayerRemoving`) and in `game:BindToClose`, and keep requests under the rate limits. Never let a client decide what gets saved.]=],
+		[=[local DSS = game:GetService("DataStoreService")
+local store = DSS:GetDataStore("Coins")
+
+local function save(userId, coins)
+	for i = 1, 3 do
+		local ok, err = pcall(store.UpdateAsync, store, tostring(userId), function() return coins end)
+		if ok then return true end
+		warn(err); task.wait(2 * i)
+	end
+	return false
+end]=]),
+
+	E("rbx_collection", "luau", "CollectionService tags and Attributes",
+		"collectionservice tag tags attribute attributes getattribute setattribute gettagged tagged group instances behavior many objects",
+		[=[CollectionService lets you tag Instances and run the same code on every tagged object: `CollectionService:GetTagged("Door")` plus `GetInstanceAddedSignal` / `GetInstanceRemovedSignal` for objects that stream in or out. Attributes (`obj:SetAttribute("Health", 100)`, `obj:GetAttribute`, `GetAttributeChangedSignal`) store small per-instance values that show in the Properties panel and replicate with the instance.]=],
+		[=[local CS = game:GetService("CollectionService")
+local function setup(door) print("door ready", door) end
+for _, d in ipairs(CS:GetTagged("Door")) do setup(d) end
+CS:GetInstanceAddedSignal("Door"):Connect(setup)]=]),
+
+	E("rbx_input", "luau", "Player input for PC and mobile",
+		"userinputservice contextactionservice input keyboard mouse touch gamepad mobile key press inputbegan bind action gameprocessed button",
+		[=[Use `UserInputService.InputBegan` / `InputEnded` (check `gameProcessedEvent` so typing in chat doesn't trigger actions) or `ContextActionService:BindAction`, which also creates an on-screen button on mobile. Check `UserInputService.TouchEnabled` to adapt layouts, and give touch players a tappable alternative to every keybind.]=],
+		[=[local UIS = game:GetService("UserInputService")
+UIS.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+	if input.KeyCode == Enum.KeyCode.F then print("F pressed") end
+end)]=]),
+
+	E("rbx_perf", "luau", "General Luau performance habits",
+		"performance optimize lag fps slow memory leak disconnect connection debounce cache loop task wait spawn defer garbage allocation weak device",
+		[=[Cache lookups outside loops (`local insert = table.insert`, store instances instead of calling FindFirstChild every frame), disconnect connections and Destroy instances you are done with, avoid creating tables/strings every frame, debounce spammy events, use `task.defer`/`task.spawn` instead of `spawn`, spread heavy work over frames with `task.wait()`, and measure with the MicroProfiler and `os.clock()` before optimising.]=],
+		nil),
+
+	-- ===================== GAME SECURITY (defensive) =====================
+	E("sec_overview", "sec", "Game environment vulnerabilities: the client is untrusted",
+		"vulnerability vulnerabilities vulnerable exploit exploiter exploiting security secure insecure game environment weakness hole cheat cheating anticheat protect prevent safe how games get exploited",
+		[=[Core rule: **the client is untrusted, the server is authoritative.** An exploiter controls everything on their own client (their scripts, their character's physics, what they fire at remotes) but cannot directly change server-only state. Games get exploited when the server *believes* the client instead of checking.
+
+Typical weaknesses, from the developer's side:
+- Remotes that accept any argument and act on it (give items, damage, teleport, set stats).
+- Server logic that relies on values the client reports (position, speed, health, "I touched this").
+- Client-owned physics (network ownership) with no sanity checks.
+- Privileged remotes or modules left in places every client can see, or admin checks done on the client.
+- No rate limits, so a remote can be spammed.
+
+I explain how to find and fix these weaknesses in a game you build or administer; I don't give step-by-step ways to attack another game.]=],
+		nil),
+
+	E("sec_remotes", "sec", "Hardening RemoteEvents: validate everything on the server",
+		"validate validation remote remoteevent sanitize sanity check argument type range cooldown rate limit debounce spam secure remotes protect server side trust player permission",
+		[=[For every `OnServerEvent`: (1) check argument **types and ranges**, (2) check the **player is allowed** to do this right now (alive, owns the item, close enough, cooldown passed), (3) compute the outcome **on the server** instead of accepting a result from the client, (4) **rate limit** per player, (5) keep admin or reward logic out of anything a client can trigger directly. Never send the server a price, damage number or target position and then trust it; send an intent ("buy Sword") and let the server look up the rest.]=],
+		[=[local lastUse = {}
+remote.OnServerEvent:Connect(function(player, itemId)
+	if typeof(itemId) ~= "string" or not Catalog[itemId] then return end
+	local now = os.clock()
+	if now - (lastUse[player] or 0) < 0.5 then return end -- rate limit
+	lastUse[player] = now
+	if not canAfford(player, Catalog[itemId].price) then return end
+	charge(player, Catalog[itemId].price); give(player, itemId) -- server decides
+end)
+game.Players.PlayerRemoving:Connect(function(p) lastUse[p] = nil end)]=]),
+
+	E("sec_netowner", "sec", "Network ownership, physics and fling-style abuse",
+		"network ownership netowner setnetworkowner physics fling velocity simulation radius character part unanchored client physics server authority anti fling teleport speed hack replicate",
+		[=[Roblox gives the nearest player's client **network ownership** of unanchored parts so physics feels smooth; that client's simulation replicates to others. Because of that, a client can move or fling things it owns, and its own character's position is trusted by default. Developer mitigations: set critical parts to `SetNetworkOwner(nil)` (server-owned) or anchor them, validate movement on the server (see the sanity-check entry), reset or kick characters whose velocity or position is impossible, and don't let gameplay-critical state depend on client physics. This is also why reanimation tricks are visible to other players: owned physics replicates.]=],
+		[=[-- make a part server-owned so a client can't drive its physics
+if part:CanSetNetworkOwnership() then
+	part:SetNetworkOwner(nil)
+end]=]),
+
+	E("sec_server_checks", "sec", "Server-side sanity checks (speed, teleport, cooldowns)",
+		"sanity check speed teleport distance walkspeed anticheat detect magnitude cooldown server check heartbeat character rollback kick log suspicious",
+		[=[Cheap, effective checks: compare each character's position between server ticks and flag movement faster than WalkSpeed/JumpPower allow (allow for lag and vehicles), cap how often actions can happen, verify range and line of sight for hits on the server, and prefer **rollback** (put the player back) or logging over instant bans to avoid false positives. Detection that runs on the client can be switched off by the client, so the authoritative check has to live on the server.]=],
+		[=[local last = {}
+game:GetService("RunService").Heartbeat:Connect(function(dt)
+	for _, p in ipairs(game.Players:GetPlayers()) do
+		local root = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+		if root then
+			local prev = last[p]
+			if prev and (root.Position - prev).Magnitude > 120 * dt then
+				root.CFrame = CFrame.new(prev) -- roll back, then log it
+			end
+			last[p] = root.Position
+		end
+	end
+end)]=]),
+
+	E("sec_report", "sec", "Found a vulnerability? Report it responsibly",
+		"report disclose disclosure bug bounty hackerone found vulnerability developer tell responsible ethical rules terms of service ban safe",
+		[=[If you find a weakness in someone's game, tell the developer (Discord, group wall, or the game's contact) with clear steps to reproduce and a suggested fix, and don't abuse it. Weaknesses in the Roblox platform itself go to Roblox's official bug bounty program. Running unauthorised scripts in other people's experiences can break the Roblox Terms of Use and risks account bans, so test on your own places.]=],
+		nil),
+
+	-- ===================== HELPING OTHERS =====================
+	E("help_style", "help", "How to help someone with a script problem",
+		"help assist support helping others teach explain beginner friendly patient answer person stuck question how to help someone support users community",
+		[=[Good help is: (1) **understand first**: ask what they expected, what happened, and the exact error text; (2) **smallest fix**: change one thing and say why; (3) **match their level**: plain words and a short snippet for beginners, detail for experienced users; (4) **teach the check**: show how they can find the cause next time (Output window, print, WaitForChild); (5) **be kind**: never make someone feel silly for asking. Offer one clear next step instead of a wall of options.]=],
+		nil),
+
+	E("help_troubleshoot", "help", "Troubleshooting checklist for a Roblox script",
+		"troubleshoot troubleshooting not working broken fix bug checklist debug nothing happens error output console executor game why stuck problem steps diagnose",
+		[=[1. Read the **Output/Console** error and its line number. 2. Is it running where you think (LocalScript vs Script, executor vs Studio)? 3. Does the object exist yet? Use WaitForChild/FindFirstChild and check for nil. 4. Print the values just before the failing line. 5. Does the executor support the function you call (loadstring, writefile, firesignal, replicatesignal...)? 6. Did the game update or change names? 7. Isolate: remove everything except the broken part and test it alone. Report back with the exact error, what you tried and your executor/game.]=],
+		nil),
+
+	E("help_beginner", "help", "Learning path for Roblox Lua beginners",
+		"beginner learn learning start new noob tutorial roadmap resources documentation docs creator hub practice first script how do i learn lua roblox study",
+		[=[A simple order: variables and printing -> if/else -> loops -> functions -> tables -> events (`:Connect`) -> Instances and properties -> services (Players, RunService, TweenService) -> client/server and RemoteEvents -> DataStores. Practice by making tiny things (a part that changes colour on touch, a GUI button, a kill brick). The official Roblox Creator Documentation has the API reference and tutorials; read the Output window every time something fails.]=],
+		nil),
+
+	E("help_bugreport", "help", "Writing a good bug report or support request",
+		"bug report issue support request template feedback what to include executor game error steps reproduce version screenshot ask for help message",
+		[=[Include: the script/mod name and version, your executor and device (PC or mobile), the game or place, the exact error text, the steps that trigger it, what you expected vs what happened, and what you already tried. One issue per report. This lets whoever helps you reproduce it instead of guessing.]=],
+		nil),
 }
 
 Knowledge.verified = DATA

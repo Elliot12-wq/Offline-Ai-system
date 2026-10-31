@@ -72,7 +72,7 @@ function NLP.overlap(a, b)
 end
 
 -- ===== topics =====
-local TOPICS = { ui = {}, reanim = {}, luau = {} }
+local TOPICS = { ui = {}, reanim = {}, luau = {}, sec = {}, help = {} }
 local function addTopic(t, words, w)
 	for _, x in ipairs(words) do TOPICS[t][stem(x)] = w end
 end
@@ -90,6 +90,10 @@ addTopic("luau", { "luau", "lua", "variable", "function", "table", "loop", "meta
 	"nil", "ipairs", "pairs", "script", "scope", "return", "parameter", "argument", "vararg", "insert", "sort", "print", "warn", "typeof",
 	"tostring", "tonumber", "service", "event", "signal", "connect", "instance", "pattern", "gsub", "format", "executor", "loadstring" }, 1)
 addTopic("luau", { "luau", "metatable", "coroutine", "pcall", "closure", "modulescript", "dictionary" }, 2)
+addTopic("luau", { "remote", "remoteevent", "remotefunction", "heartbeat", "runservice", "raycast", "datastore", "collectionservice", "attribute", "userinputservice", "localscript", "strict", "client", "server" }, 1)
+addTopic("sec", { "vulnerability", "vulnerable", "exploit", "exploiter", "exploiting", "security", "secure", "anticheat", "validate", "validation", "sanity", "cheat", "cheater", "ownership", "networkowner", "disclosure", "protect", "weakness" }, 1)
+addTopic("sec", { "vulnerability", "exploiter", "anticheat", "validation", "sanity" }, 2)
+addTopic("help", { "help", "assist", "support", "troubleshoot", "beginner", "teach", "tutorial", "learn", "stuck", "newbie", "noob", "guide", "report", "bug", "checklist" }, 1)
 
 local function detectTopic(terms)
 	local best, bestScore, second = nil, 0, 0
