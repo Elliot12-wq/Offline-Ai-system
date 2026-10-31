@@ -22,9 +22,17 @@ local T = {
 local txtSize = UIS.TouchEnabled and 14 or 15
 
 function UI.init(c) ctx, Config = c, c.Config end
--- embed mode: when a host frame is set the window fills it instead of floating in its own ScreenGui
-local host
-function UI.setHost(f) host = f end
+-- embed mode: the window fills a host frame (main UI overlay or Delta tab) and can be moved between hosts
+local host, hostConn
+function UI.setHost(f)
+	host = f
+	if hostConn then hostConn:Disconnect() hostConn = nil end
+	if win and f then
+		win.Parent = f
+		hostConn = f:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() if UI.relayout then UI.relayout() end end)
+		if UI.relayout then UI.relayout() end
+	end
+end
 
 -- ===== helpers =====
 local function hex(c)
@@ -483,6 +491,7 @@ local function layout()
 	local W = math.clamp(vp.X - 20, 300, 900)
 	local Hh = math.clamp(vp.Y - 20, 320, 620)
 	if host then local hs = host.AbsoluteSize; W, Hh = math.max(280, hs.X), math.max(260, hs.Y) end
+	if UI._close then local cl = host == nil or host:GetAttribute("AIClose") == true; UI._close.Visible = cl; if statusRow then statusRow.Position = UDim2.new(1, cl and -44 or -12, 0.5, 0) end end
 	geo.compact = W < 640
 	geo.sideW = geo.compact and math.min(250, math.floor(W * 0.78)) or 230
 	local mainX = geo.compact and 0 or geo.sideW
@@ -504,6 +513,8 @@ local function layout()
 		if r.c then r.c.MaxSize = Vector2.new(maxBubble(), math.huge) end
 	end
 end
+
+UI.relayout = layout
 
 -- ===== build =====
 local function build()
@@ -543,9 +554,9 @@ local function build()
 		TextSize = 15, TextColor3 = T.text, TextXAlignment = Enum.TextXAlignment.Left }, topbar)
 	local closeBtn = new("TextButton", { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -8, 0.5, 0), Size = UDim2.fromOffset(30, 30), BackgroundTransparency = 1,
 		Text = "\195\151", TextSize = 22, Font = Enum.Font.GothamMedium, TextColor3 = T.sub }, topbar)
-	closeBtn.Visible = host == nil
+	UI._close = closeBtn
 	closeBtn.MouseButton1Click:Connect(function() if H then H.close() end end)
-	statusRow = new("Frame", { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, host and -12 or -44, 0.5, 0), Size = UDim2.fromOffset(0, 24), AutomaticSize = Enum.AutomaticSize.X,
+	statusRow = new("Frame", { AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -44, 0.5, 0), Size = UDim2.fromOffset(0, 24), AutomaticSize = Enum.AutomaticSize.X,
 		BackgroundTransparency = 1 }, topbar)
 	new("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal, Padding = UDim.new(0, 6), SortOrder = Enum.SortOrder.LayoutOrder, VerticalAlignment = Enum.VerticalAlignment.Center }, statusRow)
 	pill.neu = mkPill(statusRow, 1)
@@ -639,7 +650,7 @@ local function build()
 	end)
 	local cam = workspace.CurrentCamera
 	if cam then conn(cam:GetPropertyChangedSignal("ViewportSize"), layout) end
-	if host then conn(host:GetPropertyChangedSignal("AbsoluteSize"), layout) end
+	if host then hostConn = host:GetPropertyChangedSignal("AbsoluteSize"):Connect(layout) end
 
 	layout()
 	setCompH(46)
