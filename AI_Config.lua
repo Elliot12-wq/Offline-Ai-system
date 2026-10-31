@@ -2,7 +2,7 @@
 local Config = {}
 
 Config.Name = "Nooby Neural AI"
-Config.Version = "1.0.0"
+Config.Version = "2.0.0"
 Config.Dir = "NoobyAI"
 Config.ModelFile = "model.json"
 

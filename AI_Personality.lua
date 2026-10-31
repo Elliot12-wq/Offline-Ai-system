@@ -73,9 +73,10 @@ function Personality.capabilities()
 - **UI**: ScreenGui, Frames, buttons, themes, TweenService, layouts, optimization
 - **Reanimation**: R6/R15, Motor6D, CFrame, physics, sync, troubleshooting
 - **Luau**: variables, functions, tables, metatables, coroutines, debugging, modules
+- **This script**: where any button, toggle or tab is, what Uh Admin commands do, what each reanimation option means, and why a reanimate fails
 - Paste code and ask me to explain it or find problems.
 
-I learn locally: say `remember: ...` to teach me something, correct me with "no, ..." and I'll keep the fix. Commands: `/status`, `/neural on|off`, `/forget <topic>`, `/new`, `/reset confirm`.]]
+I learn locally: say `remember: ...` to teach me something, correct me with "no, ..." and I'll keep the fix. Commands: `/memory`, `/forget <id or topic>`, `/edit <id> <text>`, `/confirm <id>`, `/why`, `/gaps`, `/sync`, `/mind`, `/status`, `/neural on|off`, `/new`, `/reset confirm`.]]
 end
 
 function Personality.unknown(related)
@@ -137,6 +138,8 @@ function Personality.ack(ev)
 		return "Thanks for the correction. I saved it and will prefer it for similar questions."
 	elseif k == "needfix" then
 		return "Sorry about that. What should the right answer be? Send it and I'll remember it (or say `never mind`)."
+	elseif k == "rejected" then
+		return "I won't store that: " .. (ev.why or "it didn't pass my safety checks") .. ". I only learn useful facts, preferences and corrections."
 	elseif k == "level" then
 		return "Got it, I'll pitch explanations for a " .. ev.level .. " from now on."
 	elseif k == "verbosity" then

@@ -133,6 +133,7 @@ function Retrieval.search(a, prev)
 			if d.topic and a.topic and d.topic == a.topic then s = s * 1.25 end
 			local it = K.learned.byId[id]
 			if it then s = s * (1.1 + 0.05 * math.min(it.h, 10)) end
+			if ctx.Mind then s = s * ctx.Mind.weight(id) end
 			if s > 0.05 then list[#list + 1] = { id = id, score = s } end
 		end
 	end

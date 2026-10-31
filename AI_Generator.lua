@@ -199,7 +199,7 @@ local function composeKnowledge(a, r)
 		local v = top.e
 		local body = v.text
 		if v.src == "user" then
-			body = (v.kind == "correction" and "Based on a correction you gave me earlier (unverified): " or "From what you taught me (unverified): ") .. v.text
+			body = (v.kind == "correction" and "Based on a correction you gave me earlier (unverified): " or (v.kind == "solution" and "A fix that worked for you before: " or "From what you taught me (unverified): ")) .. v.text
 		end
 		if verb == "short" then body = firstPara(body) end
 		out[#out + 1] = body
@@ -259,16 +259,19 @@ function Generator.reply(a, r, ev)
 	local P = ctx.Personality
 	if ev then return mk(P.ack(ev), { ids = {}, topic = a.topic }) end
 	local i = a.intent
-	if i == "greeting" then return mk(P.greet()) end
+	if i == "greeting" then return mk(P.greet() .. (ctx.Mind and ctx.Mind.continuity() or "")) end
 	if i == "thanks" then return mk(P.thanks()) end
 	if i == "bye" then return mk(P.bye()) end
-	if i == "identity" then return mk(P.identity(ctx.Neural.status())) end
+	if i == "identity" then return mk(P.identity(ctx.Neural.status()) .. (ctx.Mind and ctx.Mind.identityNote() or "")) end
 	if i == "capabilities" then return mk(P.capabilities()) end
 	if i == "smalltalk" then return mk(P.smalltalk(a.text)) end
-	if i == "memory_query" then return mk(memoryReply()) end
+	if i == "memory_query" then return mk(ctx.Mind and ctx.Mind.memoryReply() or memoryReply()) end
 	if i == "teach" then return mk(P.ack({ kind = "teachhelp" })) end
 	if i == "setting" or i == "forget" or i == "correction" then return mk("Okay.") end
-	return composeKnowledge(a, r)
+	local M = ctx.Mind
+	local alt = M and M.compose(a, r)
+	local res = alt or composeKnowledge(a, r)
+	return M and M.decorate(a, r, res) or res
 end
 
 return Generator

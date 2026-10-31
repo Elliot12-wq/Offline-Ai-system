@@ -663,7 +663,7 @@ function Knowledge.view(id)
 	if e then return { id = e.id, src = "verified", topic = e.topic, title = e.title, text = e.text, code = e.code, kind = "entry" } end
 	local it = L.byId[id]
 	if it then
-		return { id = it.id, src = "user", kind = it.kind, title = it.kind == "correction" and "Your correction" or "Something you taught me", text = it.a, q = it.q }
+		return { id = it.id, src = "user", kind = it.kind, title = it.kind == "correction" and "Your correction" or (it.kind == "solution" and "A fix that worked before" or "Something you taught me"), text = it.a, q = it.q }
 	end
 	return nil
 end
