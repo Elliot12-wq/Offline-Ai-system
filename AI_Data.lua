@@ -1,143 +1,296 @@
--- AI_Data: generated from a_very_cool_script_v276 (UI map + Uh Admin / Nameless Admin command registry). Loaded lazily by AI_Script.
+-- AI_Data: generated from a_very_cool_script_v291 (UI map with per-control descriptions + Uh Admin / Nameless Admin command registry). Loaded lazily by AI_Script.
 local D = {}
-D.build = "v276"
+D.build = "v291"
+-- ui line: Section|Path <US> Type(B button, S toggle/slider, D dropdown, T text box, L color picker) <US> Label <US> Description
 D.ui = [=====[
-Owner broadcast (owner only)|Main pageBSend announcement
-Owner broadcast (owner only)|Main pageBCopy backend (announcement_server.js)
-Intro settings|Main pageDIntro
-Intro settings|Main pageSSkip Intro
-Intro settings|Main pageSTransition Blur
-Intro settings|Main pageSFancy Transitions
-Intro settings|Main pageSExtra UI Sounds
-Intro settings|Main pageSAmbient FX
-Customization entry|Main pageBCustomization >
-Customization page|Main page > CustomizationBPreview Intro
-Customization page|Main page > CustomizationBTest Notification
-Customization page|Main page > CustomizationLUI Scale (zoom)
-Customization page|Main page > CustomizationDUI Font
-Customization page|Main page > CustomizationSAmbient Particles (palette colored)
-Customization page|Main page > CustomizationSAccent Sheen (animated gradient)
-Customization page|Main page > CustomizationSCursor Trail / Touch Ripples
-Customization page|Main page > CustomizationSLiquid Glass (iOS 27): buttons, sliders, toggles, fields
-Customization page|Main page > CustomizationLGlass clarity (left = clear, right = frosted / tinted)
-Customization page|Main page > CustomizationSHaptic Feedback (vibrate on phones)
-Customization page|Main page > CustomizationBReset Proportions
-Customization page|Main page > CustomizationBReset Triangle Position
-Customization page|Main page > CustomizationBDelta Script Cache: Show Stats + Clear
-Customization page|Main page > CustomizationBPreview Delta Intro
-Customization page|Main page > CustomizationBReset All Customization
-UI Theme & visual effects|Main pageDUI Theme
-UI Theme & visual effects|Main pageSFast Particle Effects
-Engine number settings / asset loading|Main pageBReload Render Assets
-Engine number settings / asset loading|Main pageSPreload Assets On Load
-Engine number settings / asset loading|Main pageBLoad Game Assets
-Music|Main page > MusicBMusic >
-Limb Reanimator config|Main page > Reanimator dropdown = Limb ReanimatorDRootPart Mode
-Limb Reanimator config|Main page > Reanimator dropdown = Limb ReanimatorDRootPart Velocity
-Limb Reanimator config|Main page > Reanimator dropdown = Limb ReanimatorDInit Mode
-Limb Reanimator config|Main page > Reanimator dropdown = Limb ReanimatorSShow me how I look!
-Limb Reanimator config|Main page > Reanimator dropdown = Limb ReanimatorSTarget Fling Enabled
-Limb Reanimator config|Main page > Reanimator dropdown = Limb ReanimatorBCheck Limb Compatibility
-Limb Reanimator config|Main page > Reanimator dropdown = Limb ReanimatorBDump Fake Character State (console + clipboard)
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorSPermadeath (dolteddown's pd)
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorSAuto Force Respawn when stuck
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorLStuck timeout (seconds)
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorDrespawntp
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorSHat Collide
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorDTorso Offset
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorSEnsure All Hats
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorDEnsure Hat Collide
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorSHat Fling
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorSHat Spin Fling
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorDTarget Fling Method
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorSTool Holding
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorDtoolanim Method
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorBRebuild Hat Map
-Hats Reanimator config|Main page > Reanimator dropdown = Hats ReanimatorBForce Respawn Now
-Tool Reanimation config|Main page > Reanimator dropdown = Tool ReanimationDTool Method
-Tool Reanimation config|Main page > Reanimator dropdown = Tool ReanimationSPermadeath (dolteddown's pd)
-Tool Reanimation config|Main page > Reanimator dropdown = Tool ReanimationSAuto Force Respawn when stuck
-Tool Reanimation config|Main page > Reanimator dropdown = Tool ReanimationLStuck timeout (seconds)
-Tool Reanimation config|Main page > Reanimator dropdown = Tool ReanimationDrespawntp
-Tool Reanimation config|Main page > Reanimator dropdown = Tool ReanimationSTarget Fling Enabled
-Tool Reanimation config|Main page > Reanimator dropdown = Tool ReanimationSTool Collide
-Tool Reanimation config|Main page > Reanimator dropdown = Tool ReanimationBForce Respawn Now
-Reanimator|Main pageDReanimator
-Reanimator|Main pageB* Reanimate *
-Reanimator|Main pageBShow Reanimate Hitboxes
-Reanimator|Main pageBRefresh Reanimate Character
-Reanimate Character Settings|Main pageSInfinite Jump
-Reanimate Character Settings|Main pageSNoclip
-Reanimate Character Settings|Main pageSSmooth Camera
-Reanimate Character Settings|Main pageSFirst Person Body
-Reanimate Character Settings|Main pageSAllow Shiftlock
-Reanimate Character Settings|Main pageSCan Sit on Seats
-Reanimate Character Settings|Main pageSCan Pickup Tools
-Reanimate Character Settings|Main pageSApply Scale to Gravity
-Reanimate Character Settings|Main pageSVoid Float
-Fly & WalkSpeed|Main pageSCustom WalkSpeed
-Fly & WalkSpeed|Main pageLWalkSpeed
-Fly & WalkSpeed|Main pageSFly  (E = up, Q = down)
-Fly & WalkSpeed|Main pageLFly Speed
-Fly & WalkSpeed|Main pageDFly Toggle Key
-Fly & WalkSpeed|Main pageBForce Sit (2x to remove gyro)
-Character scale|Main pageLCharacter Scale
-Character scale|Main pageLPlaceholders
-Performance|Main pageSLow End UI Mode
-Performance|Main pageSAnti Lag (remove all textures)
-Performance|Main pageSHide All Players
-Fling|Main pageDFling Method
-Fling|Main pageBAlt-fling: resend command
-Fling|Main pageBRequest Served User
-Fling|Main pageBView users I'm Alt Flinger for
-Fling|Main pageSClick Fling
-Kill|Main pageSToggle Kill
-Kill|Main pageSYa kids tool kill option
-Kill|Main pageBKill All
-Teleport|Main pageSKey+Click Teleport
-Teleport|Main pageDTP Key
-Teleport|Main pageSTP Key Held
-Teleport|Main pageBTeleport to 0, highest, 0
-Teleport|Main pageBTeleport to 'LastSafe'
-Server Hop|Main pageDHop Mode
-Server Hop|Main pageSSkip servers I visited (1h)
-Server Hop|Main pageSAuto Execute after hop / rejoin
-Server Hop|Main pageBServer Hop
-Server Hop|Main pageBRejoin This Server
-Internals Settings|Main pageSHook LoadAnimation
-Internals Settings|Main pageSPatchma-like Netless
-Internals Settings|Main pageLNetless Velocity
-Internals Settings|Main pageSApply RotVelocity
-Movesets / Dances / Dance Keybinds|Main pageBMovesets >
-Movesets / Dances / Dance Keybinds|Main pageBDances >
-Movesets / Dances / Dance Keybinds|Main pageBDance Keybinds >
-Movesets / Dances / Dance Keybinds|Main pageSDance Keybinds Enabled
-Movesets / Dances / Dance Keybinds|Main pageBM - Page
-Movesets / Dances / Dance Keybinds|Main pageBPlay Dance
-Hub, AI, credits and logs|Main pageBNooby Neural AI >
-Hub, AI, credits and logs|Main pageBNooby's Script Hub (NOT FROM SCRIPTHUB) >
-Hub, AI, credits and logs|Main pageB* Run all
-Hub, AI, credits and logs|Main pageBCredits
-Hub, AI, credits and logs|Main pageLTransparency
-Hub, AI, credits and logs|Main pageBChangelogs
-Hub, AI, credits and logs|Main pageBInit Logs
-Modules management|Main pageDModule Loading
-Modules management|Main pageBReload Modules
-Modules management|Main pageBReload User Modules
-Security|Main pageSBackground Malware Scan
-Security|Main pageSAuto-Delete Malware (EXPERIMENTAL)
-Security|Main pageBScan Now
-Security|Main pageBCLEAR ALL DOWNLOADED CONTENT
-Feature Center / Live Players / Performance Monitor|Main pageBFeature Center >
-Feature Center / Live Players / Performance Monitor|Main pageBLive Players >
-Feature Center / Live Players / Performance Monitor|Main pageBPerformance Monitor >
-Feature Center / Live Players / Performance Monitor|Main pageBPause
-Feature Center options|Main page > Feature CenterSBackdrop blur
-Local modules page|Main pageBRedownload/Update
-Local modules page|Main pageBDelete Module
-Marketplace|Main pageBSee what you have >
-Marketplace|Main pageBBuy Module for
-Marketplace|Main pageBSee what we have >
+Owner broadcast (owner only)|Main pageBSend announcementOwner only: sends the text you typed (max 200 characters) as an announcement to every user of the script.
+Owner broadcast (owner only)|Main pageBCopy backend (announcement_server.js)Owner only: copies the Node.js backend that serves announcements to your clipboard so you can host it.
+Intro settings|Main pageDIntroPicks which startup intro plays: Original, Moonlight, Jealousy, lil peep, Liquid Smooth, Thriller, Perfect Face, The Aura Farmer, In The End, Impostor Syndrome, Paparazzi, Baby One More Time or Survivor. Picking one starts downloading its song.
+Intro settings|Main pageSSkip IntroSkips the intro animation on start.
+Intro settings|Main pageSTransition BlurAdds a soft blur while pages slide in and out.
+Intro settings|Main pageSFancy TransitionsTurns the animated page transitions on or off.
+Intro settings|Main pageSExtra UI SoundsPlays extra click and transition sounds in the UI.
+Intro settings|Main pageSAmbient FXTurns the ambient background effects of the UI on or off.
+Navigation|Main pageBCustomization >Opens the Customization page: colors, triangle, intro text, notifications, chat styling, proportions and more.
+Navigation|Main pageDUI ThemeSwitches the whole look of the script. Presets include RGB/Default, ALONE, Oxide, Patchma Hub, Genesis V4, Crimson, r/masterhacker, Homer Simpson, Immortality Lord, LIGHT RGB, LIGHT ALONE, Roserika, FastTracker II Blue, Cherry Blossom, Sakura, Tommorow Night 80s, User Defined and Modjo Disco Sunset.
+Navigation|Main pageBFeature Center >Opens a menu that lists every option of the main page sorted into categories (Live Players, Performance, Reanimation, Movesets, Fling, Teleport, Customization, Music, Script Hub, Marketplace, Security, Info). Good place to start if you cannot find something.
+Navigation|Main pageBLive Players >Opens the live players page: active players list with search, Join Player, remote moderation and owner alerts.
+Navigation|Main pageBPerformance Monitor >Opens live performance graphs (FPS and memory); the Pause button freezes the graphs.
+Navigation|Main pageBMusic >Opens the music page where the script UI music is controlled.
+Navigation|Main pageBJARVIS >Opens me, the built-in offline assistant. I answer questions about the script, Roblox and reanimation, and remember what you teach me.
+Navigation|Main pageBNooby's Script Hub (NOT FROM SCRIPTHUB) >Opens Nooby's own list of scripts. Tap a script to run it, or use 'Run all' to run the whole list.
+Navigation|Main pageBCreditsOpens the credits page with the people and projects the script builds on.
+Navigation|Main pageBChangelogsOpens the list of changes between script versions.
+Navigation|Main pageBInit LogsOpens the initialization log shown when the script starts: errors, warnings and security notices from module loading.
+Visual Effects (Roblox engine)|Main pageSFast Particle EffectsSets a Roblox fast-flag so particles render cheaper. Needs an executor with setfflag support.
+Visual Effects (Roblox engine)|Main pageBReload Render AssetsTells Roblox to reload its render assets, which can fix missing or stuck textures.
+Asset loading|Main pageSPreload Assets On LoadPreloads the game assets automatically when the game loads, so they stream in before you need them.
+Asset loading|Main pageBLoad Game AssetsPreloads the game assets right now.
+Reanimator|Main pageDReanimatorChooses the reanimation method: Limb Reanimator, Hats Reanimator, Tool Reanimation or Ragdoll Reanimator. The block right under it ("-=+ <method> Config +=-") shows the settings of the chosen method.
+Reanimator|Main pageB* Reanimate *Starts the selected reanimation. While it runs the button becomes a stop button and the status line shows "Running: <method>"; pressing it again deanimates.
+Reanimator|Main pageBShow Reanimate HitboxesShows the hitboxes of your reanimated character (what the server sees). Only works while reanimated.
+Reanimator|Main pageBRefresh Reanimate CharacterRebuilds the reanimate character if it looks wrong.
+Limb Reanimator config|Main page > Reanimator dropdown > Limb ReanimatorDRootPart ModeHow the reanimated root part is handled. Pick a different mode if your character behaves oddly.
+Limb Reanimator config|Main page > Reanimator dropdown > Limb ReanimatorDRootPart VelocityVelocity applied to the root part: No Velocity, Follow Character or Fling-like.
+Limb Reanimator config|Main page > Reanimator dropdown > Limb ReanimatorDInit ModeHow the reanimation starts: Reset Character, CDSB + Reset, or CDSB + SSE + Kill. Try the next one if a game rejects the first.
+Limb Reanimator config|Main page > Reanimator dropdown > Limb ReanimatorSShow me how I look!Replicates your reanimated look to yourself at 10 FPS so you can see what other players see.
+Limb Reanimator config|Main page > Reanimator dropdown > Limb ReanimatorSTarget Fling EnabledLets the reanimated character fling targets (Click Fling / Toggle Kill need this). Everyone you touch loses network ownership.
+Limb Reanimator config|Main page > Reanimator dropdown > Limb ReanimatorBCheck Limb CompatibilitySpawn a character first, then press it. It checks game animations, voice chat players, dynamic faces, the game environment and R6/R15 and tells you whether Limb Reanimator will work here.
+Limb Reanimator config|Main page > Reanimator dropdown > Limb ReanimatorBDump Fake Character State (console + clipboard)Copies a debug dump of the fake character to the console and clipboard, for bug reports.
+Ragdoll Reanimator config|Main page > Reanimator dropdown > Ragdoll ReanimatorLRagdoll StiffnessHow hard the ragdoll limbs are pulled toward the pose. Higher is stiffer. Applies on the next Reanimate. Ragdoll Reanimation detaches your real limbs into BallSocket ragdoll limbs and drives them to the reanimated pose; it also uses the Limb Reanimator settings. (Range 10-200.)
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorSPermadeath (dolteddown's pd)Uses dolteddown's permadeath so your real character stays dead while the hats are driven. Needs replicatesignal support from your executor.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorSAuto Force Respawn when stuckIf the reanimate never finishes, respawns you automatically after the stuck timeout.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorLStuck timeout (seconds)How long to wait before Auto Force Respawn kicks in. (Range 5-60.)
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorDrespawntpWhere your character goes after a force respawn: The Void, Behind ReanimCharacter, Randomtp near, At spawn, or Under ReanimCharacter (Keep Streamed).
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorSHat CollideMakes the hats collide so they act like solid limbs. If your hats get voided, try changing Torso Offset.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorDTorso OffsetChanges the torso offset used by Hat Collide. Change it if hats are voided when Hat Collide is on.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorSEnsure All HatsOnly reanimates when every hat is accounted for.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorDEnsure Hat CollideMakes sure hats collide: Off, Atleast one, or Atleast #hats - 2.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorSHat FlingFlings people with your hats. Do not combine with Target Fling unless you want a walkfling.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorSHat Spin FlingSpins your hats to fling. Combining it with target fling makes the character look glitchy.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorDTarget Fling MethodWhich method the hats use to fling a clicked target.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorSTool HoldingLets the reanimated character hold tools.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorDtoolanim MethodTool animation style: Disabled or Sword.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorBRebuild Hat MapUse it when your rig was built wrong or you switched to a new rig; it rebuilds which hat becomes which limb.
+Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorBForce Respawn NowRespawns you immediately without waiting for the stuck timeout.
+Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationDTool MethodOriginal equips your tools, breaks the character's joints and drives the freed handles. Corpse Claim arms every tool, kills the real character so the server frees all grips together, then drives the tools.
+Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationSPermadeath (dolteddown's pd)Keeps your real character alive so the tools stay yours. Off means the tools are lost when the game respawns you.
+Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationSAuto Force Respawn when stuckRespawns you automatically if the reanimate never finishes.
+Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationLStuck timeout (seconds)Slider (5-60) for Auto Force Respawn.
+Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationSTool CollideMakes the tool limbs collide with the world.
+Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationSTarget Fling EnabledEnables fling for tool reanimation; the biggest tool handle you own is thrown at fling targets.
+Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationBForce Respawn NowRespawns you immediately.
+Reanimate Character Settings|Main pageSInfinite JumpLets the reanimated character jump again in mid-air.
+Reanimate Character Settings|Main pageSNoclipLets the reanimated character pass through walls and objects.
+Reanimate Character Settings|Main pageSSmooth CameraSmooths the camera while reanimated.
+Reanimate Character Settings|Main pageSFirst Person BodyShows your body in first person.
+Reanimate Character Settings|Main pageSAllow ShiftlockAllows Shift Lock while reanimated.
+Reanimate Character Settings|Main pageSCan Sit on SeatsLets the reanimated character sit on seats.
+Reanimate Character Settings|Main pageSCan Pickup ToolsLets the reanimated character pick up tools from the ground.
+Reanimate Character Settings|Main pageSApply Scale to GravityScales gravity with the character scale so big or small characters fall naturally.
+Reanimate Character Settings|Main pageSVoid FloatKeeps the character floating instead of falling when it goes into the void.
+Fly & WalkSpeed|Main pageSCustom WalkSpeedTurns on your own WalkSpeed value.
+Fly & WalkSpeed|Main pageLWalkSpeedThe WalkSpeed used when Custom WalkSpeed is on. (Range 1-250.)
+Fly & WalkSpeed|Main pageSFly  (E = up, Q = down)Turns flying on or off. E goes up, Q goes down.
+Fly & WalkSpeed|Main pageLFly SpeedHow fast you fly. (Range 5-300.)
+Fly & WalkSpeed|Main pageDFly Toggle KeyPick a key (None, F, Y, O, I) that toggles flying.
+Fly & WalkSpeed|Main pageBForce Sit (2x to remove gyro)Forces your character to sit. Press it twice to remove the gyro it adds.
+Fly & WalkSpeed|Main pageLCharacter ScaleResizes the reanimated character. (Range 0.5-5.)
+Fly & WalkSpeed|Main pageLPlaceholdersTransparency of the placeholder parts shown for your real limbs. (Range 0-1.)
+Performance|Main pageSLow End UI ModeFixes lag spikes on weak devices: simpler 3D triangle and a basic UI without effects. Turn it off to get everything back.
+Performance|Main pageDPerformance ProfileAuto, Ultra, High, Balanced, Low or Potato. Auto adapts to your device and FPS; picking one manually turns automatic adjustments off.
+Performance|Main pageSAnti Lag (remove all textures)Removes textures in the game to raise FPS.
+Performance|Main pageSHide All PlayersHides every other player on your screen.
+Fling|Main pageDFling MethodChooses how flings work: Default (spins into the target at high velocity), Weak (just trips them), Nooby's Method (clips inside their root part and flings them to the nullzone), NaN State, Fling 1 (Nameless/Source), Fling 2 (Carpet), Fling 3 (Hidden/Flight) or Alt-fling (your Nameless Admin alt does the flinging).
+Fling|Main pageBAlt-fling: resend commandSends the alt-fling command to your alt again. Only works with the Alt-fling method.
+Fling|Main pageBRequest Served UserType a username in the box above it and press this to ask that player to be your Served User for alt-fling (it waits for their admin whitelist whisper).
+Fling|Main pageBView users I'm Alt Flinger forShows the users you currently serve as their alt flinger.
+Fling|Main pageSClick FlingFlings whoever you click, using the selected Fling Method.
+Fling|Main pageSToggle KillAutomatically kills targets with an equipped damage tool (sword). Needs Target Fling enabled and an executor with firetouchinterest.
+Fling|Main pageSYa kids tool kill optionChanges how Toggle Kill uses tools (kids-tool variant).
+Fling|Main pageBKill AllRuns through every player and tries to kill them. Needs Toggle Kill requirements.
+Teleport|Main pageSKey+Click TeleportHold the TP key and click to teleport the reanimated character to the click position.
+Teleport|Main pageDTP KeyChooses the key for Key+Click Teleport (Left Ctrl default, inno's pick, Tab, Z, X, F, T).
+Teleport|Main pageSTP Key HeldMakes the TP key behave as hold-to-teleport.
+Teleport|Main pageBTeleport to 0, highest, 0Teleports to the top of the map at X=0, Z=0.
+Teleport|Main pageBTeleport to 'LastSafe'Teleports to the last safe spot under the void height.
+Teleport|Main pageTTeleport To PlayerType a player name (partial works) and the character teleports to them.
+Server Hop|Main pageDHop ModeRandom server, Fewest players or Most players (not full).
+Server Hop|Main pageSSkip servers I visited (1h)Avoids servers you were in during the last hour.
+Server Hop|Main pageSAuto Execute after hop / rejoinRuns this script again in the new server. It finds its own file in your executor workspace folder, so normally you set nothing.
+Server Hop|Main pageToverride: file name or link (optional)Optional file name or raw https:// link for Auto Execute if the script cannot find its own file.
+Server Hop|Main pageBServer HopTeleports you to another server using the Hop Mode.
+Server Hop|Main pageBRejoin This ServerRejoins the same server.
+Internals Settings|Main pageSHook LoadAnimationHooks LoadAnimation for the reanimated character (may not work for you on some executors).
+Internals Settings|Main pageSUse Physics GlueInternals for physics-based reanimation like hat reanimator. Do not use tool fling with physics glue.
+Internals Settings|Main pageSPatchma-like NetlessKeeps network ownership of your parts so they do not drift or snap back.
+Internals Settings|Main pageLNetless VelocityThe velocity used by Patchma-like Netless. (Range 25.01-30.)
+Internals Settings|Main pageSApply RotVelocityApplies rotational velocity to parts; toggle it if limbs spin.
+Movesets / Dances|Main pageBMovesets >Opens the moveset list. Open one, press Use Moveset and its Configuration section appears.
+Movesets / Dances|Main pageBDances >Opens the dance list. Open one and press Play Dance (it becomes Stop Dance).
+Movesets / Dances|Main pageBDance Keybinds >Opens the dance keybind list (a key per dance, M switches page).
+Movesets / Dances|Main pageSDance Keybinds EnabledTurns the dance keybinds on so pressing the key plays that dance.
+Marketplace|Main pageBStore >The Marketplace page (the button says Store or Marketplace). Download and delete user-made modules, movesets and dances.
+Marketplace|Main pageBSee what we have >Browse the online user modules (Buy Module for... downloads one).
+Marketplace|Main pageBSee what you have >Shows the modules you already downloaded; open one to Redownload/Update or Delete Module.
+Marketplace|Main pageBBuy Module forDownloads the module from the marketplace. Reload your modules afterwards to apply it.
+Marketplace|Main pageBRedownload/UpdateDeletes the local copy of that module and downloads it again.
+Marketplace|Main pageBDelete ModuleDeletes the module. It asks for several clicks to confirm.
+Modules management|Main pageDModule LoadingHow modules load: Default, Splitted (2 at a time) or Instant (all at once). Use a gentler mode on weak devices.
+Modules management|Main pageBReload ModulesReloads every module with a short loading screen.
+Modules management|Main pageBReload User ModulesReloads only your downloaded user modules.
+Live players|Main pageTSearch name / game / serverSearches the ACTIVE PLAYERS list by name, game or server.
+Live players|Main pageTTarget (tap a player or type username / ID)The target for the remote moderation buttons below.
+Live players|Main pageBKillRemote moderation (staff roles only): kills the target.
+Live players|Main pageBDeanimateRemote moderation: stops the target's reanimation.
+Live players|Main pageBKickRemote moderation: kicks the target.
+Live players|Main pageBBanRemote moderation: bans the target.
+Live players|Main pageBUnbanRemote moderation: removes the ban from the target.
+Security|Main pageSBackground Malware ScanKeeps scanning downloaded content in the background for malicious code.
+Security|Main pageSAuto-Delete Malware (EXPERIMENTAL)Deletes anything the scan flags. Experimental: it can delete a safe file by mistake.
+Security|Main pageBScan NowRuns a malware scan right now.
+Security|Main pageBCLEAR ALL DOWNLOADED CONTENTDANGER ZONE. Deletes everything the script downloaded (needs repeated clicks to confirm) and reloads modules.
+Color system|Main page > CustomizationDAccent modeHow the UI accent color is chosen (picked color, harmony, aurora, music-driven and more).
+Color system|Main page > CustomizationDColor harmony (secondary + tertiary colors)How the secondary and tertiary colors are derived from the accent.
+Color system|Main page > CustomizationLDynamic color speedHow fast animated color modes cycle.
+Color system|Main page > CustomizationLSaturationColor saturation of the palette.
+Color system|Main page > CustomizationLBrightnessBrightness of the palette.
+Color system|Main page > CustomizationPBase / picked color (used by Picked, Harmony, Aurora, Music modes)Color picker for the base accent color.
+Triangle|Main page > CustomizationDTriangle Color ModeTheme (follows UI color), Custom color, Rainbow or Dynamic palette.
+Triangle|Main page > CustomizationPTriangle custom color (used by Custom color)Color of the 3D triangle when Custom color is selected.
+Triangle|Main page > CustomizationLTriangle SizeSize of the 3D loader triangle.
+Triangle|Main page > CustomizationLTriangle Spin SpeedHow fast the triangle spins.
+Triangle|Main page > CustomizationLFace TransparencyTransparency of the triangle faces.
+Triangle|Main page > CustomizationLEdge ThicknessThickness of the triangle edges.
+Triangle|Main page > CustomizationSShow Vertex OrbsShows glowing orbs at the triangle corners.
+Triangle|Main page > CustomizationSShow Faces (off = wireframe)Turns the filled faces on or off (off leaves a wireframe).
+Triangle|Main page > CustomizationSReact To MusicMakes the triangle react to the music beat.
+Triangle|Main page > CustomizationSMusic Dance (triangles + logos follow the beat)Triangles and logos move to the beat.
+Triangle|Main page > CustomizationSMusic Colors (UI accent follows the beat)The UI accent color follows the beat.
+Triangle|Main page > CustomizationSHold 5s To ExplodeHold the triangle for 5 seconds to make it explode (visual effect).
+Intro (customization)|Main page > CustomizationTIntro title text (max 20 characters)Custom title shown in the intro.
+Intro (customization)|Main page > CustomizationTIntro subtitle (empty = default)Custom subtitle for the intro.
+Intro (customization)|Main page > CustomizationTIntro scrolling text (empty = random)Custom scrolling text in the intro.
+Intro (customization)|Main page > CustomizationDIntro ColorDisco palette, Custom color, White or Dynamic palette.
+Intro (customization)|Main page > CustomizationPIntro custom color (used by Custom color)Color used when Intro Color is Custom.
+Intro (customization)|Main page > CustomizationSWarp StarfieldStarfield effect in the intro.
+Intro (customization)|Main page > CustomizationSGod RaysGod ray effect in the intro.
+Intro (customization)|Main page > CustomizationSScanline + Letterbox BarsScanlines and cinema bars in the intro.
+Intro (customization)|Main page > CustomizationSHUD Brackets + CounterHUD brackets and counter in the intro.
+Intro (customization)|Main page > CustomizationLEffects Intensity (shake / flash)Strength of shake and flash in the intro.
+Intro (customization)|Main page > CustomizationBPreview IntroPlays the intro now so you can see your changes.
+Notifications|Main page > CustomizationDNotification ModeHow notifications are shown (Roblox popup, UI bar or both).
+Notifications|Main page > CustomizationLDuration (seconds)How long a notification stays.
+Notifications|Main page > CustomizationTRoblox popup titleTitle of Roblox popup notifications.
+Notifications|Main page > CustomizationDUI bar positionBelow window, Above window, Top of screen or Bottom of screen.
+Notifications|Main page > CustomizationLUI bar widthWidth of the notification bar.
+Notifications|Main page > CustomizationLUI bar text sizeText size of the notification bar.
+Notifications|Main page > CustomizationSShow progress barShows a progress bar on notifications.
+Notifications|Main page > CustomizationPNotification bar colorColor of the notification bar.
+Notifications|Main page > CustomizationSPlay sound on notificationPlays a sound when a notification appears.
+Notifications|Main page > CustomizationLSlide animation speedSpeed of the notification slide animation.
+Notifications|Main page > CustomizationBTest NotificationSends a test notification.
+Extra UI|Main page > CustomizationLBackground TransparencyTransparency of the UI background.
+Extra UI|Main page > CustomizationLBorder ThicknessBorder thickness.
+Extra UI|Main page > CustomizationLCorner RoundnessHow round the corners are.
+Extra UI|Main page > CustomizationSGlow EffectAdds a glow to the UI.
+Extra UI|Main page > CustomizationLAnimation speed (effects, transitions)Speed of UI animations.
+Extra UI|Main page > CustomizationDPage transitionStyle of page transitions: Liquid (default), Push, Sheet Rise, Zoom Through, Depth Dive, Fan Card, Island Morph, Pull Down, Stack Shuffle, Elastic Pop, Swipe Away and more.
+Extra UI|Main page > CustomizationDButton animationButton press animation: Original, Jelly, Wiggle, Pop Burst, Haptic Nudge, Shockwave, Whirl, Tilt Follow, Glow Pulse, Drop & Settle or Sheen Sweep.
+Extra UI|Main page > CustomizationLUI Scale (zoom)Zooms the whole UI. (Range 1-1.5.)
+Extra UI|Main page > CustomizationDUI FontChanges the UI font.
+Extra UI|Main page > CustomizationSAmbient Particles (palette colored)Floating particles in the UI colored by your palette.
+Extra UI|Main page > CustomizationSAccent Sheen (animated gradient)Animated gradient sheen on accents.
+Extra UI|Main page > CustomizationSCursor Trail / Touch RipplesTrail behind the cursor or ripples where you touch.
+Extra UI|Main page > CustomizationSLiquid Glass (iOS 27): buttons, sliders, toggles, fieldsGlass look for controls.
+Extra UI|Main page > CustomizationLGlass clarity (left = clear, right = frosted / tinted)Clear to frosted glass.
+Extra UI|Main page > CustomizationSHaptic Feedback (vibrate on phones)Vibrates on phones when you press things.
+Roblox icon / top bar|Main page > CustomizationSTheme-colored top bar icons (Roblox, menu, chat)Colors the Roblox top bar icons with your theme.
+Roblox icon / top bar|Main page > CustomizationSTheme-colored top bar background (Roblox button + menu/chat pill)Colors the top bar backgrounds with your theme.
+Chat|Main page > CustomizationSChat styling (follows the UI theme)Styles the Roblox chat with your UI theme.
+Chat|Main page > CustomizationLChat text sizeChat text size.
+Chat|Main page > CustomizationLChat background transparencyChat background transparency.
+Chat|Main page > CustomizationLChat window widthChat window width.
+Chat|Main page > CustomizationLChat window heightChat window height.
+Chat|Main page > CustomizationLBubble duration (seconds)How long chat bubbles stay.
+Chat|Main page > CustomizationLBubble max distanceDistance up to which bubbles show.
+Chat|Main page > CustomizationSBubble tail visibleShows or hides the tail of chat bubbles.
+Character proportions|Main page > CustomizationLWidth (sides)Spreads limbs and hats sideways on the reanimate character (1 = normal). (Range 0.5-3.)
+Character proportions|Main page > CustomizationLHeightSpreads limbs and hats vertically. (Range 0.5-3.)
+Character proportions|Main page > CustomizationLDepthSpreads limbs and hats front to back. (Range 0.5-3.)
+Character proportions|Main page > CustomizationBReset ProportionsSets width, height and depth back to 1. It does not resize hat meshes themselves.
+Command triangle|Main page > CustomizationSHide Command TriangleHides the Uh Admin triangle launcher (hold it to hide too). A small tab at the top edge brings it back; so does typing showtri.
+Command triangle|Main page > CustomizationSRestore tab while hiddenKeeps the small restore tab visible while the triangle is hidden.
+Command triangle|Main page > CustomizationBReset Triangle PositionPuts the triangle back at the top centre if it ended up off-screen.
+Delta customization|Main page > CustomizationSDelta customizer (built in, applies on next start)Master switch for the Delta customizer (only runs on the Delta executor).
+Delta customization|Main page > CustomizationSNooby triangle as Delta iconUses the Nooby triangle as the Delta icon.
+Delta customization|Main page > CustomizationSSmooth Delta page transitionsSmooth transitions in Delta pages.
+Delta customization|Main page > CustomizationSSubtle blur during transitionsLight blur during Delta transitions.
+Delta customization|Main page > CustomizationS5-second Delta mini-intro (after Nooby's intro)Short Delta intro after the main intro.
+Delta customization|Main page > CustomizationLDelta page animation speedSpeed of Delta animations.
+Delta customization|Main page > CustomizationTDelta customizer source override (file path or https URL, optional - empty = built-in)Optional custom source for the Delta customizer.
+Delta customization|Main page > CustomizationSDelta fast execute (cached compile + cached downloads, applies to the next script you run)Caches compile and downloads so scripts you run start faster.
+Delta customization|Main page > CustomizationSDelta script helpers API (cached compile + paced queue)Exposes a cached-compile helper API with a paced queue.
+Delta customization|Main page > CustomizationBDelta Script Cache: Show Stats + ClearShows the script cache stats then clears the cache.
+Delta customization|Main page > CustomizationBPreview Delta IntroPlays the Delta mini-intro.
+Delta customization|Main page > CustomizationBReset All CustomizationResets every customization option to default.
+Roblox engine settings|Main pageSRender Streamed RegionsRoblox engine setting NetworkSettings.RenderStreamedRegions (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSPrint Join Size BreakdownRoblox engine setting NetworkSettings.PrintJoinSizeBreakdown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSPrint Stream Instance QuotaRoblox engine setting NetworkSettings.PrintStreamInstanceQuota (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSShow Active Animation AssetRoblox engine setting NetworkSettings.ShowActiveAnimationAsset (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSRandomize Join Instance OrderRoblox engine setting NetworkSettings.RandomizeJoinInstanceOrder (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSPhysics Allow SleepRoblox engine setting PhysicsSettings.AllowSleep (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSPhysics Anchors ShownRoblox engine setting PhysicsSettings.AreAnchorsShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSPhysics Assemblies ShownRoblox engine setting PhysicsSettings.AreAssembliesShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSPhysics Body Types ShownRoblox engine setting PhysicsSettings.AreBodyTypesShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSCollision Costs ShownRoblox engine setting PhysicsSettings.AreCollisionCostsShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSJoint Coordinates ShownRoblox engine setting PhysicsSettings.AreJointCoordinatesShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSPhysics Owners ShownRoblox engine setting PhysicsSettings.AreOwnersShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSPhysics Regions ShownRoblox engine setting PhysicsSettings.AreRegionsShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSAwake Parts HighlightedRoblox engine setting PhysicsSettings.AreAwakePartsHighlighted (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSContact Points ShownRoblox engine setting PhysicsSettings.AreContactPointsShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSMechanisms ShownRoblox engine setting PhysicsSettings.AreMechanismsShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSUnaligned Parts ShownRoblox engine setting PhysicsSettings.AreUnalignedPartsShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSReceive Age ShownRoblox engine setting PhysicsSettings.IsReceiveAgeShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSInterpolation Throttle ShownRoblox engine setting PhysicsSettings.IsInterpolationThrottleShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSPhysics Tree ShownRoblox engine setting PhysicsSettings.IsTreeShown (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSDecomposition GeometryRoblox engine setting PhysicsSettings.ShowDecompositionGeometry (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSDraw Contacts Net ForceRoblox engine setting PhysicsSettings.DrawContactsNetForce (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSDraw Constraints Net ForceRoblox engine setting PhysicsSettings.DrawConstraintsNetForce (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSDraw Total Net ForceRoblox engine setting PhysicsSettings.DrawTotalNetForce (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSForce Instance NamesRoblox engine setting PhysicsSettings.ShowInstanceNamesForDrawnForcesAndTorques (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSRender Bounding BoxesRoblox engine setting RenderSettings.ShowBoundingBoxes (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSRender CSG Triangles DebugRoblox engine setting RenderSettings.RenderCSGTrianglesDebug (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSFrame Rate ManagerRoblox engine setting RenderSettings.EnableFRM (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSEager Bulk ExecutionRoblox engine setting RenderSettings.EagerBulkExecution (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSExport Merge By MaterialRoblox engine setting RenderSettings.ExportMergeByMaterial (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSReport Sound WarningsRoblox engine setting DebugSettings.ReportSoundWarnings (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageSVideo Capture EnabledRoblox engine setting GameSettings.VideoCaptureEnabled (copied from Nameless Admin's settings page). Saved and re-applied on the next start; mostly a debug overlay or rendering switch.
+Roblox engine settings|Main pageTForce Draw ScaleNumber box for the Roblox engine setting PhysicsSettings.ForceDrawScale. Saved and re-applied on the next start.
+Roblox engine settings|Main pageTTorque Draw ScaleNumber box for the Roblox engine setting PhysicsSettings.TorqueDrawScale. Saved and re-applied on the next start.
+Roblox engine settings|Main pageTFluid Force Draw ScaleNumber box for the Roblox engine setting PhysicsSettings.FluidForceDrawScale. Saved and re-applied on the next start.
+Roblox engine settings|Main pageTForce Smoothing StepsNumber box for the Roblox engine setting PhysicsSettings.ForceVisualizationSmoothingSteps. Saved and re-applied on the next start.
+Roblox engine settings|Main pageTThrottle Adjust TimeNumber box for the Roblox engine setting PhysicsSettings.ThrottleAdjustTime. Saved and re-applied on the next start.
+Roblox engine settings|Main pageTAuto FRM LevelNumber box for the Roblox engine setting RenderSettings.AutoFRMLevel. Saved and re-applied on the next start.
+Roblox engine settings|Main pageTMesh Cache SizeNumber box for the Roblox engine setting RenderSettings.MeshCacheSize. Saved and re-applied on the next start.
+Roblox engine settings|Main pageTIncoming Replication Lag (seconds)Number box for the Roblox engine setting NetworkSettings.IncomingReplicationLag. Saved and re-applied on the next start.
+Roblox engine settings|Main pageTPhysics Environmental Throttle (1 default, 2 disabled)Number box for the Roblox engine setting PhysicsSettings.PhysicsEnvironmentalThrottle. Saved and re-applied on the next start.
+]=====]
+-- cats line: Section <US> Feature Center category it is listed under
+D.cats = [=====[
+Owner broadcast (owner only)Live Players / Moderation
+Intro settingsMusic / Sound
+NavigationCustomization / Settings
+Visual Effects (Roblox engine)Customization / Settings
+Asset loadingCustomization / Settings
+ReanimatorReanimation / Character
+Limb Reanimator configReanimation / Character
+Ragdoll Reanimator configReanimation / Character
+Hats Reanimator configReanimation / Character
+Tool Reanimation configReanimation / Character
+Reanimate Character SettingsReanimation / Character
+Fly & WalkSpeedReanimation / Character
+PerformancePerformance / Graphics
+FlingFling / Interaction
+TeleportTeleport / Servers
+Server HopTeleport / Servers
+Internals SettingsReanimation / Character
+Movesets / DancesMovesets / Dances
+MarketplaceMarketplace
+Modules managementScript Hub / Modules
+Live playersLive Players / Moderation
+SecuritySecurity / Danger Zone
+Color systemCustomization
+TriangleCustomization
+Intro (customization)Customization
+NotificationsCustomization
+Extra UICustomization
+Roblox icon / top barCustomization
+ChatCustomization
+Character proportionsCustomization
+Command triangleCustomization
+Delta customizationCustomization
+Roblox engine settingsCustomization / Settings
 ]=====]
 D.cmds = [=====[
 scriptls,s,runscript <source> (ls, s, run)Run the code requested
@@ -303,8 +456,8 @@ limbbouncelimbbounce [height] [distance]Make your limbs bounce around your he
 limborbitlimborbit [height] [distance]Make your limbs orbit around your head
 fakelagflagfakelag (flag)fake lag
 unfakelagunflagunfakelag (unflag)stops the fake lag command
-circlemathcmcirclemath <mode> <size>Gay circle math Modes: abc...
-toolanimatetoolanimate <mode> <int>Make your tools epic Modes: ufo/ring/shutter/saturn/portal/wtf/ball/tor
+circlemathcmcirclemath <mode> <size>Gay circle math\nModes: abc...
+toolanimatetoolanimate <mode> <int>Make your tools epic\nModes: ufo/ring/shutter/saturn/portal/wtf/ball/tor
 hideunshowhide <player> (unshow)places the selected player to lighting
 unhideshowshow <player> (unhide)places the selected player back to workspace
 aimbotaimbotui,aimbotguiaimbot (aimbotui, aimbotgui)aimbot and yeah
@@ -315,7 +468,7 @@ unloopgrabtoolsunloopgrabtoolsStops the loop grab command
 dancedanceDoes a random dance
 undanceundanceStops the dance command
 animspooferanimationspoofer,spoofanim,animspoofanimationspoofer (animspoof, spoofanim)Loads up an animation spoofer, spoofs animations that use rbxassetid
-tooldancetdtooldance <mode> <size>Make your tools dance Modes: tor/sph/inf/rng/whl/wht/voi
+tooldancetdtooldance <mode> <size>Make your tools dance\nModes: tor/sph/inf/rng/whl/wht/voi
 copygameidcgameidcopygameid (cgameid)Copies the id of the game youre in
 lowholdlowholdBoombox low hold
 copynamecnamecopyname <player> (cname)Copies the username of the target
@@ -360,7 +513,7 @@ lookatstarestare <player> (lookat)Stare at a player
 unlookatunstareunstare (unlookat)Stops staring
 watchview,specateview <player>Watch the given player
 unwatchunview,unspectateunviewStop watching a player
-stealaudiogetaudio,steal,logaudiostealaudio <player> (getaudio, logaudio, steal)Save all sounds a player is playing to a file -Cyrus
+stealaudiogetaudio,steal,logaudiostealaudio <player> (getaudio, logaudio, steal)Save all sounds a player is playing to a file  -Cyrus
 followstalk,walkfollow <player>Follow a player wherever they go
 pathfindpathfind <player>Follow a player using the pathfinder API wherever they go
 unfollowunstalk,unwalk,unpathfindunfollowStop all attempts to follow a player

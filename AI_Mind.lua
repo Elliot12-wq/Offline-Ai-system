@@ -452,6 +452,7 @@ function Mind.compose(a, r)
 	local tt = {}
 	for k, id in ipairs(sa.ids) do tt[k] = Script.title(id) end
 	session.last = { src = "script", titles = tt, conf = sa.strong and "high" or "low" }
+	session.scriptTurn = S.turns
 	return { text = text, meta = { ids = {}, topic = "script", src = "script" } }
 end
 
@@ -703,6 +704,21 @@ function Mind.pre(raw)
 		return nil
 	end
 	local lo = raw:lower()
+	-- script navigation: tour / "what's in the Fling options" / "what does that do?" about the control I just described
+	if Script.ready() then
+		local ok, br = pcall(Script.browse, raw)
+		if ok and br then
+			session.last = { src = "script", titles = {}, conf = "high" }
+			session.scriptTurn = S.turns
+			return { text = br }
+		end
+		if #lo <= 48 and session.last and session.last.src == "script" and session.scriptTurn and S.turns - session.scriptTurn <= 6
+			and (lo:find("^what does that") or lo:find("^what does it") or lo:find("^what is that") or lo:find("^what'?s that") or lo:find("^explain that") or lo:find("^explain it")
+			or lo:find("^where is that") or lo:find("^where is it") or lo:find("^where do i find") or lo:find("^and what does") or lo:find("^what do they do")) then
+			local ok2, t = pcall(Script.describeLast, lo)
+			if ok2 and t then return { text = t } end
+		end
+	end
 	if S.task and S.task.cur and not S.task.resolved and #lo <= 60
 		and (lo:find("^that didn'?t work") or lo:find("^didn'?t work") or lo:find("^still not") or lo:find("^still broken") or lo:find("^not working") or lo:find("^nope")) then
 		local t = Mind.nextDx()

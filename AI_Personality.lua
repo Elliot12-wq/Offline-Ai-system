@@ -54,9 +54,9 @@ function Personality.greet(cv)
 		return pick({ "Hey again" .. userName() .. ". " .. (t and ("Still on **" .. t .. "**, or something new?") or "What's next?"), "I'm here" .. userName() .. ". What do you need?" })
 	end
 	return pick({
-		"Hey" .. userName() .. "! Ask me about your script, UI, reanimation or Luau, or paste code or an error.",
-		"Hi" .. userName() .. "! What are you working on: the script, UI, reanimation, or some Luau?",
-		"Hello" .. userName() .. "! Paste an error or code, or just ask.",
+		"Hey" .. userName() .. "! Ask me what any button in the script does, where to find it, or anything about reanimation, UI or Luau. Say `tour` for a map of the script.",
+		"Hi" .. userName() .. "! Looking for a feature, stuck on a reanimate, or working on some Luau? I can also walk you through the script if you say `tour`.",
+		"Hello" .. userName() .. "! Ask what a button does, paste an error or code, or just tell me what you want to do.",
 	})
 end
 
@@ -123,7 +123,7 @@ function Personality.capabilities()
 - **UI**: ScreenGui, Frames, buttons, themes, TweenService, layouts, optimization
 - **Reanimation**: R6/R15, Motor6D, CFrame, physics, sync, troubleshooting
 - **Luau**: variables, functions, tables, metatables, coroutines, debugging, modules
-- **This script**: where any button, toggle or tab is, what Uh Admin commands do, what each reanimation option means, and why a reanimate fails
+- **This script**: what every button, toggle, dropdown and tab does and where it is (try `tour`, "what does Noclip do", "where is Server Hop", "what's in the Fling options", or just describe what you want like "walk through walls"), what Uh Admin commands do, what each reanimation option means, and why a reanimate fails
 - Paste code and ask me to explain it or find problems.
 - Follow-ups work: "why?", "how?", "make it better", "what about X", "simpler", "example". Say `that didn't work` during a diagnosis and I move to the next cause.
 
@@ -143,7 +143,7 @@ function Personality.unknown(related, unmatched, cv)
 	if cv and cv.last and cv.last.title then
 		return s .. " If this is about **" .. cv.last.title .. "**, say what part and I'll narrow it down. Otherwise paste the code or error, or teach me with `remember: ...`."
 	end
-	return s .. " Paste the relevant code or error, rephrase, or teach me with `remember: ...`."
+	return s .. " Paste the relevant code or error, rephrase, ask for a `tour` of the script, or teach me with `remember: ...`."
 end
 
 -- short connective at the start of an answer. Mostly nil: the answer itself comes first.
