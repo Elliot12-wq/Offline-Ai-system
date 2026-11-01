@@ -1,6 +1,6 @@
--- AI_Data: generated from a_very_cool_script_v291 (UI map with per-control descriptions + Uh Admin / Nameless Admin command registry). Loaded lazily by AI_Script.
+-- AI_Data: generated from a_very_cool_script_v291, updated for v300 (UI Cache switch) (UI map with per-control descriptions + Uh Admin / Nameless Admin command registry). Loaded lazily by AI_Script.
 local D = {}
-D.build = "v291"
+D.build = "v300"
 -- ui line: Section|Path <US> Type(B button, S toggle/slider, D dropdown, T text box, L color picker) <US> Label <US> Description
 D.ui = [=====[
 Owner broadcast (owner only)|Main pageBSend announcementOwner only: sends the text you typed (max 200 characters) as an announcement to every user of the script.
@@ -78,6 +78,7 @@ Fly & WalkSpeed|Main pageBForce Sit (2x to remove gyro)Forces your character 
 Fly & WalkSpeed|Main pageLCharacter ScaleResizes the reanimated character. (Range 0.5-5.)
 Fly & WalkSpeed|Main pageLPlaceholdersTransparency of the placeholder parts shown for your real limbs. (Range 0-1.)
 Performance|Main pageSLow End UI ModeFixes lag spikes on weak devices: simpler 3D triangle and a basic UI without effects. Turn it off to get everything back.
+Performance|Main pageSUI CacheStores the UI meshes, textures and graphics in UhhhhhhReanim/Assets/Cache UI and reuses them; remembers text sizes and skips unchanged per-frame colour writes. Delete that folder to rebuild it. Applies to the 3D triangle and effects on next launch.
 Performance|Main pageDPerformance ProfileAuto, Ultra, High, Balanced, Low or Potato. Auto adapts to your device and FPS; picking one manually turns automatic adjustments off.
 Performance|Main pageSAnti Lag (remove all textures)Removes textures in the game to raise FPS.
 Performance|Main pageSHide All PlayersHides every other player on your screen.
