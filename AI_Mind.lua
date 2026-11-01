@@ -437,7 +437,11 @@ function Mind.compose(a, r)
 	end
 	-- a follow-up about a script answer keeps the earlier question's terms ("where is it?", "what does that do?")
 	local aa = a
-	if a.follow and last and last.src == "script" and last.q and #a.terms <= 2 then
+	-- only when the message actually refers back ("it", "that", "and the toggles?", "what about..."); a short NEW question must not inherit the old topic
+	local pad = " " .. (a.text or ""):gsub("%p", " ") .. " "
+	local refers = a.followKind ~= nil or pad:find(" it ", 1, true) or pad:find(" that ", 1, true) or pad:find(" this ", 1, true) or pad:find(" those ", 1, true)
+		or pad:find(" them ", 1, true) or pad:find(" they ", 1, true) or pad:find("^ and ") or pad:find("^ what about ") or pad:find("^ how about ") or pad:find("^ also ")
+	if a.follow and refers and last and last.src == "script" and last.q and #a.terms <= 2 then
 		local terms, seen = {}, {}
 		for _, t in ipairs(a.terms) do seen[t] = true; terms[#terms + 1] = t end
 		for _, t in ipairs(last.terms or {}) do if not seen[t] then seen[t] = true; terms[#terms + 1] = t end end
