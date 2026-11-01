@@ -104,7 +104,7 @@ function Retrieval.search(a, prev)
 		end
 	end
 	acc(qt, 1)
-	if a.follow and a.ctxTerms then acc(a.ctxTerms, 0.4) end
+	if a.follow and a.ctxTerms then acc(a.ctxTerms, #qt <= 1 and 0.7 or 0.4) end
 
 	-- learned associations (query term -> entry), positive or negative
 	for _, t in ipairs(qt) do
@@ -168,7 +168,9 @@ function Retrieval.search(a, prev)
 	elseif top then
 		cov = 1
 	end
-	return { hits = hits, top = top, cov = cov, facts = Retrieval.facts(a) }
+	local um = {}
+	for _, t in ipairs(qt) do if not idx.post[t] and #t > 2 then um[#um + 1] = t end end
+	return { hits = hits, top = top, cov = cov, facts = Retrieval.facts(a), unmatched = um }
 end
 
 return Retrieval

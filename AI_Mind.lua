@@ -338,7 +338,8 @@ local function dxReply(d, cx, tried, lead)
 		if list[i].s > 0.2 then more[#more + 1] = "- " .. list[i].c.t .. " -> " .. list[i].c.fix end
 	end
 	if #more > 0 then out[#out + 1] = "**Otherwise try, in this order:**\n" .. table.concat(more, "\n") end
-	out[#out + 1] = "Tell me `that didn't work` and I'll rule this out and move to the next one."
+	out[#out + 1] = session.dxHint and "Say `that didn't work` to move on." or "Tell me `that didn't work` and I'll rule this out and move to the next one."
+	session.dxHint = true
 	S.task = S.task or {}
 	S.task.dx, S.task.cur, S.task.tried, S.task.t, S.task.resolved = d.id, top.c.id, tried, os.time(), false
 	S.task.method = cx.method or S.task.method
@@ -386,9 +387,47 @@ function Mind.nextDx()
 	return txt
 end
 
+-- follow-ups on a diagnosis ("why?", "how?", "simpler"): talk about the cause being tried right now
+function Mind.explainCurrent(fk)
+	local t = S.task
+	local d = t and dxById(t.dx)
+	if not d or not t.cur then return nil end
+	local c
+	for _, x in ipairs(d.causes) do if x.id == t.cur then c = x break end end
+	if not c then return nil end
+	local cx = { rig = Memory.get("rig"), method = t.method or Memory.get("reanimator method"), pf = Memory.get("platform"), ex = Memory.get("executor") }
+	local out
+	if fk == "how" then
+		out = "**To try it:** " .. c.fix
+		local nm = c.fix:match("%*%*(.-)%*%*")
+		if nm then
+			local ok, sa = pcall(Script.answer, { text = nm:lower(), raw = nm, terms = NLP.terms(nm), slots = {}, intent = "question" }, 0)
+			if ok and sa and sa.text:find("Where to find it", 1, true) then out = out .. "\n\n" .. sa.text end
+		end
+		out = out .. "\n\nThen press **Reanimate** again. If it still fails, say `that didn't work` and I'll move to the next cause."
+	elseif fk == "simplify" then
+		out = "Plainly: " .. c.t .. " So do this: " .. c.fix
+	else
+		out = "**Why I think so:** " .. c.t .. " It ranks first for '" .. d.name .. "' given what I know about your setup, so it's the cheapest thing to rule out."
+	end
+	return out .. ctxLine(cx)
+end
+
 -- ===== composition hooks (called by AI_Generator) =====
 function Mind.compose(a, r)
 	local i = a.intent
+	local cv = Memory.conv()
+	local last = cv.last
+	if last and last.src == "diag" and S.task and S.task.cur and not S.task.resolved then
+		local fk = a.followKind
+		if a.retry then
+			local t = Mind.nextDx()
+			if t then return { text = t, meta = { ids = {}, topic = "reanim", src = "diag" } } end
+		elseif fk == "why" or fk == "how" or fk == "simplify" then
+			local t = Mind.explainCurrent(fk)
+			if t then return { text = t, meta = { ids = {}, topic = "reanim", src = "diag" } } end
+		end
+	end
 	if i ~= "debug" and i ~= "question" and i ~= "howto" and i ~= "explain" and i ~= "code_request" and i ~= "compare" then return nil end
 	if a.hasCode then return nil end
 	local kcov = r and r.cov or 0
@@ -396,7 +435,15 @@ function Mind.compose(a, r)
 		local d = Mind.diagnose(a)
 		if d then session.last = { src = "diag", titles = {}, conf = "medium", cx = S.task and S.task.method } return d end
 	end
-	local sa = Script.answer(a, kcov)
+	-- a follow-up about a script answer keeps the earlier question's terms ("where is it?", "what does that do?")
+	local aa = a
+	if a.follow and last and last.src == "script" and last.q and #a.terms <= 2 then
+		local terms, seen = {}, {}
+		for _, t in ipairs(a.terms) do seen[t] = true; terms[#terms + 1] = t end
+		for _, t in ipairs(last.terms or {}) do if not seen[t] then seen[t] = true; terms[#terms + 1] = t end end
+		aa = setmetatable({ terms = terms, text = a.text .. " " .. last.q:lower(), raw = a.raw .. " " .. last.q }, { __index = a })
+	end
+	local sa = Script.answer(aa, kcov)
 	if not sa then return nil end
 	local verifiedTop = r and r.top and r.top.e.src == "verified" and kcov >= 0.5 and r.top.score >= 3
 	if not sa.strong and verifiedTop then return nil end
@@ -420,19 +467,32 @@ function Mind.decorate(a, r, res)
 	local top = r and r.top
 	if r and r.worked then add[#add + 1] = "*This is what worked for you last time.*" end
 	if r and r.alt then add[#add + 1] = "You also told me (unverified, so I'm not relying on it): " .. clip(r.alt.text, 160) end
+	session.shown = session.shown or {}
+	local shown = session.shown
 	if src == "verified" then
 		session.last = { src = "verified", titles = { top and top.e.title or "?" }, conf = (r.cov >= 0.6) and "high" or "medium", ids = meta.ids }
-		add[#add + 1] = "*Source: built-in verified knowledge.*"
+		if not shown.verified then add[#add + 1] = "*Source: built-in verified knowledge.*" end
+		shown.verified = true
 		local rig = Memory.get("rig")
 		if rig and top and RIGDEP[top.id] then add[#add + 1] = "You're on " .. rig .. ", so the " .. rig .. " parts above are the ones that apply to you." end
+		if Script.ready() and a.intent ~= "code_request" and (a.topic == "reanim" or a.topic == "ui") then
+			local ok, ui = pcall(Script.findUI, a)
+			local t = ok and ui and ui[1]
+			if t and (t.exact or (t.cov >= 0.6 and t.m >= 2)) then
+				add[#add + 1] = "In your script this is **" .. t.it.lab:gsub("%s*>%s*$", "") .. "** (in *" .. t.it.sec .. "*, via " .. t.it.path .. ")."
+			end
+		end
 	elseif src == "user" then
 		session.last = { src = "user", titles = { top and top.e.title or "?" }, conf = "low", ids = meta.ids }
-		add[#add + 1] = "*Unverified: based on what you told me. Use `/confirm` once it's proven right.*"
+		add[#add + 1] = shown.user and "*(unverified)*" or "*Unverified: based on what you told me. Use `/confirm` once it's proven right.*"
+		shown.user = true
 	elseif src == "script" then
-		add[#add + 1] = "*Source: this script's own UI and command data (build " .. Script.build() .. ").*"
+		if not shown.script then add[#add + 1] = "*Source: this script's own UI and command data (build " .. Script.build() .. ").*" end
+		shown.script = true
 	elseif src == "diag" then
-		add[#add + 1] = "*Reasoned from your symptoms and setup; I can't run anything to verify it.*"
-	elseif (res.text:find("^I don't have a good answer") or res.text:find("^That one is outside") or res.text:find("^I need a bit more to go on")) and not a.hasCode then
+		if not shown.diag then add[#add + 1] = "*Reasoned from your symptoms and setup; I can't run anything to verify it.*" end
+		shown.diag = true
+	elseif (res.text:find("^I don't have a good answer") or res.text:find("^That one is outside") or res.text:find("^I need a bit more to go on") or res.text:find("^I don't know anything about") or res.text:find("^I can't answer that exactly")) and not a.hasCode then
 		-- knowledge gap: remember it, and say so when it keeps happening
 		meta.gap = true
 		local sig = sigOf(a.terms)
@@ -484,7 +544,7 @@ function Mind.observe(raw, a, res, ev, prev)
 		for _, id in ipairs(ids) do credit(id, false) end
 	end
 	-- the same question again right away is a sign the last answer didn't help
-	if prev and not ev and KNOW[i] and not a.follow and #a.terms >= 2 and prev.terms then
+	if prev and not ev and KNOW[i] and not a.follow and #a.terms >= 2 and prev.terms and not (res.meta and res.meta.retried) then
 		local _, j = NLP.overlap(prev.terms, a.terms)
 		if j and j >= 0.8 then
 			for _, id in ipairs(ids) do credit(id, false) end

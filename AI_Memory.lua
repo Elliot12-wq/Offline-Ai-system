@@ -9,6 +9,27 @@ local seq = 0
 
 Memory.temp = {} -- session-only scratch (never persisted)
 
+-- ===== conversation state (session-only): current topic, last answer, what was already delivered, pending offer =====
+function Memory.conv()
+	local c = Memory.temp.conv
+	if not c then
+		c = { n = 0, given = {}, last = nil, lastq = nil, offer = nil, leads = {}, tips = {}, hist = {}, lastOfferTurn = -9 }
+		Memory.temp.conv = c
+	end
+	return c
+end
+
+function Memory.resetConv()
+	Memory.temp.conv, Memory.temp.prev, Memory.temp.awaitFix = nil, nil, nil
+end
+
+-- what part of an entry the user has already received (paragraph numbers, "code")
+function Memory.given(id)
+	local g = Memory.conv().given
+	if not g[id] then g[id] = {} end
+	return g[id]
+end
+
 local function norm(s)
 	return (tostring(s):lower():gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", ""))
 end
@@ -160,7 +181,7 @@ function Memory.open(id)
 	local c = S.convos[id]
 	if not c then return nil end
 	S.cur = id
-	Memory.temp.prev, Memory.temp.awaitFix = nil, nil
+	Memory.resetConv()
 	return c.m
 end
 
@@ -178,7 +199,7 @@ function Memory.delete(id)
 		if v == id then table.remove(S.order, i) break end
 	end
 	local was = S.cur == id
-	if was then S.cur = nil; Memory.temp.prev, Memory.temp.awaitFix = nil, nil end
+	if was then S.cur = nil; Memory.resetConv() end
 	Memory.touch("convos")
 	return was
 end
@@ -197,9 +218,19 @@ end
 function Memory.remember(key, value, permanent)
 	ensure()
 	key, value = norm(key), trim(value)
-	if key == "" or value == "" then return "empty" end
+	if key == "" or value == "" or #value < 2 then return "empty" end
 	if #value > 400 then value = value:sub(1, 400) end
 	local f = facts.map[key]
+	if not f and key:sub(1, 5) ~= "pref:" then
+		-- same information under a different key is a duplicate, not a new fact
+		local nv = norm(value)
+		for k, o in pairs(facts.map) do
+			if k:sub(1, 5) ~= "pref:" and norm(o.v) == nv then
+				if permanent and not o.p then o.p = true; Memory.touch("profile"); return "promoted" end
+				return "duplicate"
+			end
+		end
+	end
 	if f then
 		if norm(f.v) == norm(value) then
 			if permanent and not f.p then

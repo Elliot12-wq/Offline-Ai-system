@@ -6,10 +6,26 @@ local seq = 0
 
 function Personality.init(c) ctx = c end
 
+-- avoids lines used in the last few picks
+local recentPick = {}
 local function pick(t)
 	seq = seq + 1
-	return t[(seq + math.random(0, 2)) % #t + 1]
+	local n = #t
+	local start = (seq + math.random(0, 2)) % n
+	local chosen
+	for k = 0, n - 1 do
+		local c = t[(start + k) % n + 1]
+		local used = false
+		for _, r in ipairs(recentPick) do if r == c then used = true break end end
+		if not used then chosen = c break end
+	end
+	chosen = chosen or t[start + 1]
+	recentPick[#recentPick + 1] = chosen
+	if #recentPick > 5 then table.remove(recentPick, 1) end
+	return chosen
 end
+
+local function cvs() return ctx.Memory.conv() end
 
 local function userName()
 	local n = ctx.Memory.get("name")
@@ -25,35 +41,69 @@ function Personality.verbosity(a)
 	if a.mode == "detail" then return "detailed" end
 	local pref = ctx.Memory.pref("verbosity")
 	if pref == "short" or pref == "detailed" then return pref end
+	if a.followKind and a.followKind ~= "about" or a.retry then return "normal" end
 	if a.hasCode or a.intent == "debug" or #a.terms >= 9 then return "detailed" end
 	if #a.terms <= 3 and a.intent ~= "howto" and a.intent ~= "code_request" then return "short" end
 	return "normal"
 end
 
-function Personality.greet()
+function Personality.greet(cv)
+	cv = cv or cvs()
+	if cv.n > 1 then
+		local t = cv.last and cv.last.title
+		return pick({ "Hey again" .. userName() .. ". " .. (t and ("Still on **" .. t .. "**, or something new?") or "What's next?"), "I'm here" .. userName() .. ". What do you need?" })
+	end
 	return pick({
-		"Hey" .. userName() .. "! I'm Nooby Neural AI. Ask me about UI, reanimation or Luau.",
-		"Hi" .. userName() .. "! What are we building today: UI, reanimation, or some Luau?",
-		"Hello" .. userName() .. "! Ready when you are. Paste code or just ask a question.",
+		"Hey" .. userName() .. "! Ask me about your script, UI, reanimation or Luau, or paste code or an error.",
+		"Hi" .. userName() .. "! What are you working on: the script, UI, reanimation, or some Luau?",
+		"Hello" .. userName() .. "! Paste an error or code, or just ask.",
 	})
 end
 
-function Personality.thanks()
-	return pick({ "Glad that helped! Send the next one whenever you're ready.", "Happy to help. If anything breaks, paste the error and I'll take a look.", "Anytime!" })
-end
-
-function Personality.bye()
-	return pick({ "See you later! Your chats and what I've learned stay saved on this device.", "Bye for now. Good luck with the build!" })
-end
-
-function Personality.smalltalk(text)
-	if text:find("joke", 1, true) then
-		return pick({
-			"Why did the script go to therapy? It had too many unresolved `nil` issues.",
-			"A Luau dev walks into a bar and orders 1 beer. Then 0 beers. Then nil beers. The bartender errors out.",
-		})
+function Personality.thanks(cv)
+	cv = cv or cvs()
+	local t = cv.last and cv.last.title
+	if t and cv.last.src ~= "none" then
+		return pick({ "Glad that sorted out **" .. t .. "**. Send the next one whenever.", "Good. If **" .. t .. "** acts up again, paste the error.", "Anytime." })
 	end
-	return "Doing well, thanks for asking! What are you working on?"
+	return pick({ "Anytime.", "Happy to help. Send the next one whenever.", "Glad it helped." })
+end
+
+function Personality.bye(cv)
+	return pick({ "See you. Your chats and what I've learned stay on this device.", "Bye for now. Good luck with the build.", "Later" .. userName() .. "." })
+end
+
+local JOKES = {
+	"Why did the script go to therapy? It had too many unresolved `nil` issues.",
+	"A Luau dev walks into a bar and orders 1 beer. Then 0 beers. Then nil beers. The bartender errors out.",
+	"There are 10 kinds of devs: those who use `task.wait()` and those still using `wait()`.",
+}
+
+function Personality.smalltalk(text, cv)
+	cv = cv or cvs()
+	if text:find("joke", 1, true) then return pick(JOKES) end
+	local t = cv.last and cv.last.title
+	if t then return pick({ "Doing fine. Still on **" .. t .. "**, or something new?", "All good here. Want to keep going with **" .. t .. "**?" }) end
+	return pick({ "Doing well. What are you working on?", "All good. What's the project today?" })
+end
+
+-- reply to "ok / hmm / lol" when there is nothing pending
+function Personality.okay(cv)
+	local l = cv.last
+	if l and l.src == "diag" then return "Okay. Try it and tell me what happens; if it doesn't work, say `that didn't work` and I'll rule it out and move to the next cause." end
+	return pick({ "Okay.", "Alright. Ask whenever you're ready.", "Sure." })
+end
+
+function Personality.declined(cv)
+	return pick({ "Alright. What next?", "No problem. Anything else?" })
+end
+
+-- one natural follow-up, phrased by what it offers
+function Personality.offer(kind, title)
+	if kind == "code" then return pick({ "I can show the code for this if you want it.", "Want the code for this?" }) end
+	if kind == "next" then return "Related, if you want it next: **" .. title .. "**. Say yes and I'll cover it." end
+	if kind == "detail" then return "There's more detail on this; say yes for the rest." end
+	return nil
 end
 
 function Personality.identity(neural)
@@ -75,47 +125,52 @@ function Personality.capabilities()
 - **Luau**: variables, functions, tables, metatables, coroutines, debugging, modules
 - **This script**: where any button, toggle or tab is, what Uh Admin commands do, what each reanimation option means, and why a reanimate fails
 - Paste code and ask me to explain it or find problems.
+- Follow-ups work: "why?", "how?", "make it better", "what about X", "simpler", "example". Say `that didn't work` during a diagnosis and I move to the next cause.
 
 I learn locally: say `remember: ...` to teach me something, correct me with "no, ..." and I'll keep the fix. Commands: `/memory`, `/forget <id or topic>`, `/edit <id> <text>`, `/confirm <id>`, `/why`, `/gaps`, `/sync`, `/mind`, `/status`, `/neural on|off`, `/new`, `/reset confirm`.]]
 end
 
-function Personality.unknown(related)
-	local s = pick({
-		"I don't have a good answer for that yet.",
-		"That one is outside what I know right now.",
-	})
+function Personality.unknown(related, unmatched, cv)
+	local s
+	if unmatched and #unmatched > 0 then
+		s = "I don't know anything about `" .. table.concat(unmatched, "`, `", 1, math.min(2, #unmatched)) .. "` yet."
+	else
+		s = pick({ "I don't have a good answer for that yet.", "That one is outside what I know right now." })
+	end
 	if related and #related > 0 then
 		s = s .. " Closest things I know: " .. table.concat(related, ", ") .. "."
 	end
-	return s .. " Try rephrasing, paste the relevant code or error, or teach me with `remember: ...`."
+	if cv and cv.last and cv.last.title then
+		return s .. " If this is about **" .. cv.last.title .. "**, say what part and I'll narrow it down. Otherwise paste the code or error, or teach me with `remember: ...`."
+	end
+	return s .. " Paste the relevant code or error, rephrase, or teach me with `remember: ...`."
 end
 
-function Personality.opener(intent, level, verbosity)
-	if verbosity == "short" then return nil end
-	local o = {
-		howto = { "Here's how to do it:", "Good question. Here's the approach:" },
-		code_request = { "Here's a starting point:", "Here's something you can build from:" },
-		debug = { "Let's track this down.", "Okay, let's debug it." },
-		explain = { "Quick explanation:", "Here's the idea:" },
-		compare = { "Here's how they relate:" },
-		question = { "Here's what I know:" },
-	}
-	local list = o[intent]
-	if not list then return nil end
-	local s = pick(list)
-	if level == "beginner" then s = "No worries, we'll take it step by step. " .. s end
-	return s
+-- short connective at the start of an answer. Mostly nil: the answer itself comes first.
+function Personality.lead(a, cv, o)
+	o = o or {}
+	local fk = a.followKind
+	local l
+	if o.retry then
+		l = pick({ "That missed. Different angle:", "Let me come at it another way:" })
+	elseif fk == "why" then l = pick({ "The reason:", "Why it works that way:" })
+	elseif fk == "how" then l = "Here's how:"
+	elseif fk == "simplify" then l = pick({ "In plainer terms:", "Simpler version:" })
+	elseif fk == "improve" then l = "To take it further:"
+	elseif fk == "example" then l = "Example:"
+	elseif o.hedge then l = "Best match I have, though I'm not fully sure:"
+	elseif a.intent == "debug" and not cv.debugged then cv.debugged = true; l = "Let's track it down."
+	end
+	if Personality.level(a) == "beginner" and not cv.beginner and a.intent ~= "ack" then
+		cv.beginner = true
+		l = "We'll take it step by step." .. (l and (" " .. l) or "")
+	end
+	return l
 end
 
-function Personality.closer(a, verbosity)
-	if verbosity == "short" then return nil end
-	seq = seq + 1
-	if seq % 2 == 0 then return nil end
-	local level = Personality.level(a)
-	if level == "beginner" then return "If any part is confusing, tell me which one and I'll break it down." end
-	if verbosity == "detailed" then return "Want a variation, or should I go deeper on a specific part?" end
-	return nil
-end
+-- kept for compatibility: canned openers/closers are gone, replaced by lead()/offer()
+function Personality.opener() return nil end
+function Personality.closer() return nil end
 
 function Personality.ack(ev)
 	local k = ev.kind

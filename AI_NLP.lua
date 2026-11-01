@@ -202,9 +202,15 @@ local DEBUG_WORDS = { "error", "not working", "doesn't work", "doesnt work", "do
 	"attempt to", "nil value", "why is", "why does", "why isn", "why won", "fails", "failed", "crash", "freez", "lagg", "stuck",
 	"nothing happens", "invalid member", "infinite yield", "falls apart", "falling apart", "flinging", "glitch", "jitter", "not showing" }
 
+local IMPLIED = { "can't", "cant ", "won't", "wont ", "keeps ", "stopped ", "no longer", "isn't", "isnt ", "doesn't", "doesnt ", "didn't", "not loading", "not appearing" }
+
 local function hasDebug(head)
 	for _, w in ipairs(DEBUG_WORDS) do if head:find(w, 1, true) then return true end end
-	return head:find("%f[%w]fix%f[%W]") ~= nil
+	if head:find("%f[%w]fix%f[%W]") then return true end
+	if not (head:find("^how ") or head:find("^what ") or head:find("^why ") or head:find("^can you")) then
+		for _, w in ipairs(IMPLIED) do if head:find(w, 1, true) then return true end end
+	end
+	return false
 end
 
 local function intentOf(head, tokens, terms)
@@ -240,6 +246,49 @@ local function intentOf(head, tokens, terms)
 	return "question"
 end
 
+-- short replies: yes/no to an offer, plain acknowledgements
+local YES = set({ "yes", "yeah", "yep", "yup", "sure", "ok", "okay", "k", "please", "yes please", "go ahead", "do it", "sure thing", "ok sure", "okay sure",
+	"show me", "please do", "y", "yea", "alright", "go on", "continue", "why not", "sounds good", "ok please", "okay please" })
+local NO = set({ "no", "nope", "nah", "no thanks", "no thank you", "not now", "n", "nah im good", "im good", "nothing" })
+local ACK = set({ "ok", "okay", "k", "kk", "alright", "aight", "yes", "yeah", "yep", "yup", "sure", "lol", "lmao", "haha", "hmm", "hmmm", "i see", "oh", "ah", "ohh",
+	"wow", "interesting", "true", "fair", "fair enough", "right", "mhm", "noted", "ic", "oh ok", "oh okay", "ah ok", "ah okay", "i get it", "understood" })
+
+local COMPLAIN = { "not what i asked", "not what i meant", "didn'?t answer", "did not answer", "doesn'?t help", "does not help", "not helpful", "unhelpful",
+	"useless", "that'?s not it", "you misunderstood", "misunderstood", "you didn'?t understand", "off topic", "irrelevant", "that doesn'?t answer", "missed the point",
+	"not even close", "that is not what" }
+
+-- follow-up kinds: what the user wants done with the previous answer
+local function followKindOf(head, bare, terms)
+	if bare:find("^why$") or bare:find("^but why") or bare:find("^why so") or bare:find("^why tho") or bare:find("^how come") or bare:find("^why is (that|it|this)$")
+		or bare:find("^why does (that|it|this)") or bare:find("^why do i need") or bare:find("^what for$") or bare:find("^why not$") then return "why" end
+	if bare:find("^how$") or bare:find("^how so") or bare:find("^how exactly") or bare:find("^how do i do (that|it|this)") or bare:find("^how to do (that|it|this)")
+		or bare:find("^and how") or bare:find("^how would i") and #terms == 0 then return "how" end
+	if bare:find("what do you mean") or bare:find("don'?t understand") or bare:find("do not understand") or bare:find("confus") or bare:find("^huh") or bare:find("i'?m lost")
+		or bare:find("^simpl") or bare:find("explain (it |that )?simpl") or bare:find("easier") or bare:find("eli5") then return "simplify" end
+	if (head:find("better") or head:find("improv") or head:find("optimi[sz]") or head:find("cleaner") or head:find("polish") or head:find("upgrade") or head:find("fancier")
+		or head:find("more advanced")) and #terms <= 4 then return "improve" end
+	if bare:find("^example") or bare:find("^for example") or bare:find("^show me an? example") or bare:find("^can you show") or bare:find("^show it") or bare:find("^code$") then return "example" end
+	if head:find("^what about") or head:find("^how about") or head:find("^and what") or head:find("^and how") or head:find("^and the") or head:find("^and for") then return "about" end
+	if bare:find("^continue") or bare:find("^go on") or bare:find("^more$") or bare:find("^keep going") or bare:find("^tell me more") then return "more" end
+	if bare:find("^again$") or bare:find("^try again") or bare:find("^retry") or bare:find("^redo") or bare:find("^another way") or bare:find("^something else") then return "retry" end
+	return nil
+end
+
+-- message kind: question / instruction / opinion / correction / casual / statement
+local function kindOf(a, head)
+	local i = a.intent
+	if i == "correction" then return "correction" end
+	if i == "greeting" or i == "thanks" or i == "bye" or i == "smalltalk" or i == "ack" or i == "identity" or i == "capabilities" then return "casual" end
+	if i == "teach" or i == "setting" or i == "forget" then return "instruction" end
+	if head:find("?", 1, true) or head:find("^(what|why|how|when|where|which|who|is|are|does|do|did|should|would|could|can)%f[%W]") then return "question" end
+	if head:find("^(write|make|create|build|give|show|fix|add|remove|change|convert|explain|tell|help|list|generate|update|rewrite|implement|please)%f[%W]") then return "instruction" end
+	for _, p in ipairs({ "i think", "i feel", "imo", "i believe", "i don'?t like", "i hate", "i love", "i prefer", "sucks", "is better", "is worse", "is trash", "is mid", "is so ", "is really ", "pretty cool", "kinda " }) do
+		if head:find(p) then return "opinion" end
+	end
+	if #a.terms <= 1 then return "casual" end
+	return "statement"
+end
+
 local FOLLOW_INTENT = { question = true, howto = true, explain = true, debug = true, code_request = true, compare = true }
 
 local ENT = set({ "r6", "r15", "motor6d", "humanoid", "cframe", "tweenservice", "metatable", "coroutine", "screengui", "uicorner", "humanoidrootpart" })
@@ -250,7 +299,19 @@ function NLP.analyze(text, ctx)
 	local raw = text
 	local lower = raw:lower()
 	local prev = ctx and ctx.prev
+	local cv = NLP.conv and NLP.conv() or nil
+	local sub = cv and cv.last
+	-- the caller's "prev" is overwritten by every turn (even "ok"/"why?"); keep pointing at the last substantive answer
+	if prev and sub and (#(prev.terms or {}) == 0 or #(prev.ids or {}) == 0) then
+		prev = { topic = sub.topic or prev.topic, terms = (#(prev.terms or {}) > 0) and prev.terms or sub.terms, ids = (#(prev.ids or {}) > 0) and prev.ids or sub.ids, q = sub.q or prev.q }
+	end
 	local a = { raw = raw, text = lower, slots = {}, entities = {} }
+	local bare = lower:gsub("[%s%p]+$", ""):gsub("^[%s%p]+", ""):gsub("%s+", " ")
+	if #bare <= 24 and #bare > 0 then
+		if cv and cv.offer and YES[bare] then a.tokens, a.terms, a.intent, a.slots.reply, a.kind = {}, {}, "ack", "yes", "casual"; a.topic, a.topicScore, a.slots.gen = prev and prev.topic, 0, {}; return a end
+		if cv and cv.offer and NO[bare] then a.tokens, a.terms, a.intent, a.slots.reply, a.kind = {}, {}, "ack", "no", "casual"; a.topic, a.topicScore, a.slots.gen = prev and prev.topic, 0, {}; return a end
+		if ACK[bare] then a.tokens, a.terms, a.intent, a.slots.reply, a.kind = {}, {}, "ack", "ok", "casual"; a.topic, a.topicScore, a.slots.gen = prev and prev.topic, 0, {}; return a end
+	end
 	a.tokens = NLP.tokens(lower)
 	a.terms = NLP.terms(lower)
 	a.hasCode, a.code = NLP.code(raw)
@@ -303,6 +364,11 @@ function NLP.analyze(text, ctx)
 	local topic, score = detectTopic(a.terms)
 	a.topic, a.topicScore = topic, score
 
+	for _, p in ipairs(COMPLAIN) do
+		if head:find(p) then a.complaint = true break end
+	end
+	a.kind = kindOf(a, head)
+
 	-- follow-up detection
 	if prev and FOLLOW_INTENT[a.intent] then
 		local pad = " " .. (lower:gsub("%p", " ")) .. " "
@@ -313,6 +379,15 @@ function NLP.analyze(text, ctx)
 			a.ctxTerms = prev.terms
 			if not a.topic or a.topicScore < 2 then a.topic = prev.topic or a.topic end
 		end
+	end
+	local fk = followKindOf(head, bare, a.terms)
+	if prev and (fk or a.complaint) and (FOLLOW_INTENT[a.intent] or a.complaint) then
+		a.followKind = fk or "retry"
+		a.follow, a.ctxTerms = true, prev.terms
+		if a.followKind ~= "about" and a.followKind ~= "retry" then a.more = true end
+		if a.intent == "debug" and (fk == "why" or fk == "how") then a.intent = "explain" end
+		if a.complaint and not FOLLOW_INTENT[a.intent] then a.intent = "question" end
+		if not a.topic or (a.topicScore or 0) < 2 then a.topic = prev.topic or a.topic end
 	end
 	return a
 end
