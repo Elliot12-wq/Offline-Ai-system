@@ -1,0 +1,7 @@
+name = "jarvis-tts"
+main = "jarvis_tts_worker.js"
+compatibility_date = "2025-01-01"
+
+# Optional: pick another British-male Gemini/Chirp voice (Charon, Algieba, Orus, Rasalgethi, Alnilam, Sadaltager, Schedar)
+# [vars]
+# VOICE = "Algieba"
