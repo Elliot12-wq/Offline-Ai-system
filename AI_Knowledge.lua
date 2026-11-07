@@ -641,6 +641,42 @@ end)]=]),
 		"bug report issue support request template feedback what to include executor game error steps reproduce version screenshot ask for help message",
 		[=[Include: the script/mod name and version, your executor and device (PC or mobile), the game or place, the exact error text, the steps that trigger it, what you expected vs what happened, and what you already tried. One issue per report. This lets whoever helps you reproduce it instead of guessing.]=],
 		nil),
+	-- ===================== NOOBY'S UH MODDED REANIMATION (verified against the script source, build v324) =====================
+	E("uh_reanim_systems", "reanim", "Nooby's UH reanimation: five methods vs add-ons (Extra Unanchored, Tool Extras)",
+		"uh nooby modded reanimation methods five limb hats tool ragdoll unanchored extra unanchored tool extras add on difference separate systems distinguish three",
+		[=[The script has FIVE reanimation methods in one dropdown: Limb Reanimator, Hats Reanimator, Tool Reanimation, Ragdoll Reanimator and Unanchored Reanimation. Each one has its own config block.
+
+Two add-ons are NOT methods: **Extra Unanchored Reanimation** (bottom of the Limb / Ragdoll config) adds loose-map-part Wings, Tail and Halo Aura to the FAKE character of a running Limb/Ragdoll reanimation, and **Tool Reanimation Extras** (bottom of the Hats config) builds cosmetic Wings, Halo, Tail and Floating Aura from spare Tool handles. Tool Reanimation, by contrast, is a primary method that turns up to 6 tools into body parts. Standalone Unanchored Reanimation is independent of all of these: it uses unanchored map parts and needs no tools, hats, reset or respawn.]=],
+		nil),
+
+	E("uh_unanchored_concept", "reanim", "Unanchored parts as reanimation material (concept and limits)",
+		"unanchored parts reanimation concept network ownership simulation radius simulate loose map parts wings tail halo limbs ownership lost confirm receiveage limits why",
+		[=[Unanchored reanimation drives loose, unanchored parts of the map instead of your own limbs, tools or hats. Roblox gives the client that the engine picks as a part's simulator authority over its physics, and that client's movement replicates to others, so a script may only drive a part once it knows you really simulate it. Nooby's UH Modded Reanimation waits for the engine to confirm ownership (the part's receive age holding at 0) before it moves a part, and releases or restores things when ownership is lost.
+
+Limits that follow from this: only parts that are unanchored, not grounded to an anchored assembly and of a suitable size and shape are usable (characters, NPCs, seats, terrain, destroyed and oversized parts are rejected); parts far away need you to get near them (the script can ask before teleporting you); other players only see the parts move while you stay the simulator; and a map without suitable loose parts gives it nothing to work with.]=],
+		nil),
+
+	E("uh_toolextras_concept", "reanim", "Tool handles as cosmetic effects (Tool Reanimation Extras, concept)",
+		"tool handle handles spare tools cosmetic effects wings halo tail floating aura grip break server replicatesignal ownership backpack hats extras requirements",
+		[=[A Tool's Handle is an ordinary part once its grip to the character is broken. Tool Reanimation Extras use spare Backpack tools (never ones in use): the grip is broken on the server (this needs your executor's replicatesignal, otherwise other players won't see the tools correctly), the handle is freed, and it is driven only after the engine confirms you simulate it. Requirements per effect: Wings 6 tools, Halo 3, Tail 4, Floating Aura all remaining tools; effects are filled in that order and skipped when there are not enough spare tools. They run only while the Hats Reanimator is active and are purely cosmetic: unlike the Tool Reanimation method they do not replace any body part.]=],
+		nil),
+
+	E("uh_sec_layers", "sec", "How Nooby's UH protects you from malicious scripts (layers)",
+		"uh nooby script security protection layers malware scan external script protection anti phishing checker firewall runtime monitoring how works explain system quarantine verdict static analysis",
+		[=[Nooby's UH Modded Reanimation has two separate protection layers. **Background Malware Security** statically scans the script's own files and modules (Background Malware Scan, optional experimental Auto-Delete with a verified quarantine copy, Scan Now). **External Script Protection** guards third-party scripts you run, in five switches: the **Script Checker** inspects source before it runs, **Anti-Phishing** rates web addresses, the **Execution Firewall** pauses flagged scripts behind two typed confirmations, **Runtime Monitoring** watches guarded functions (HTTP, clipboard, files, queue_on_teleport, hooks), and a master switch turns the whole system on or off. Findings, History, Statistics and Executor Capabilities & Limits show the results. Turning any protection off requires confirming a dialog.
+
+Built-in UH Admin scripts and the embedded Nameless Admin (byte-identical, verified by SHA-256) are trusted internal code and excluded; external copies are checked like any other script.]=],
+		nil),
+
+	E("uh_sec_verdicts", "sec", "Script verdicts: CLEAN vs SUSPICIOUS vs MALICIOUS vs UNVERIFIED",
+		"verdict verdicts clean suspicious malicious unverified difference meaning safe guarantee static analysis script checker what does clean mean unverified script",
+		[=[**CLEAN** = no known bad pattern was found (never a guarantee of safety). **SUSPICIOUS** = risky patterns such as obfuscation, remote code loading or odd network use; needs a human decision. **MALICIOUS** = strong evidence such as login-cookie theft, webhook exfiltration or IP loggers. **UNVERIFIED** = the source could not be inspected (unreadable, too large, analysis failed, or compiled by the executor before UH could see it, as with editor, clipboard and script-hub scripts); for those only runtime monitoring applies, and unverified file execution (loadfile / dofile) is blocked.]=],
+		nil),
+
+	E("uh_sec_limits", "sec", "Limits of script protection in Nooby's UH (what it cannot guarantee)",
+		"security limits limitations cannot guarantee executor support interception bypass cached function require assetid redirect unverified editor clipboard script hub honest",
+		[=[The protections are best-effort, not a guarantee. Not every executor can intercept every function (the Executor Capabilities & Limits panel lists what yours covers, and if the caller of a hooked function can't be identified all interception is turned off); a script that cached an original function before UH loaded or reaches executor internals can bypass a guard; redirect chains are judged from the address text only; require(assetId) and native Roblox services not reached through a guarded call aren't intercepted; editor, clipboard and script-hub scripts can't be inspected beforehand. The background scan skips files over 6 MB, and Auto-Delete is experimental and may remove a safe file.]=],
+		nil),
 }
 
 Knowledge.verified = DATA

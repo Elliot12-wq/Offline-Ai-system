@@ -30,7 +30,8 @@ end
 
 -- ===== init / maintenance =====
 local CAT = {
-	reanim = { "reanimat", "limb", "hat", "tool", "motor6d", "r6", "r15", "fling", "rootpart", "netless", "permadeath" },
+	reanim = { "reanimat", "limb", "hat", "tool", "motor6d", "r6", "r15", "fling", "rootpart", "netless", "permadeath", "unanchor", "ragdoll", "wing", "halo", "aura", "corpse" },
+	uhsec = { "malware", "phish", "firewall", "quarantin", "extern", "protect", "unverif", "malicious", "suspicious", "scanner", "checker" },
 	uh = { "admin", "command", "prefix", "triang", "whitelist", "cmd" },
 	ui = { "ui", "gui", "button", "frame", "tween", "theme", "tab", "toggle", "slider" },
 	luau = { "lua", "luau", "function", "table", "variable", "loop", "coroutin", "metat", "module" },
@@ -441,7 +442,9 @@ function Mind.compose(a, r)
 	local pad = " " .. (a.text or ""):gsub("%p", " ") .. " "
 	local refers = a.followKind ~= nil or pad:find(" it ", 1, true) or pad:find(" that ", 1, true) or pad:find(" this ", 1, true) or pad:find(" those ", 1, true)
 		or pad:find(" them ", 1, true) or pad:find(" they ", 1, true) or pad:find("^ and ") or pad:find("^ what about ") or pad:find("^ how about ") or pad:find("^ also ")
-	if a.follow and refers and last and last.src == "script" and last.q and #a.terms <= 2 then
+	-- inside a feature family (Unanchored / Tool Extras / Security) a slightly longer follow-up still counts as the same topic
+	local fam = last and last.src == "script" and last.fam or nil
+	if a.follow and refers and last and last.src == "script" and last.q and (#a.terms <= 2 or (fam and #a.terms <= 4)) then
 		local terms, seen = {}, {}
 		for _, t in ipairs(a.terms) do seen[t] = true; terms[#terms + 1] = t end
 		for _, t in ipairs(last.terms or {}) do if not seen[t] then seen[t] = true; terms[#terms + 1] = t end end
@@ -457,7 +460,7 @@ function Mind.compose(a, r)
 	for k, id in ipairs(sa.ids) do tt[k] = Script.title(id) end
 	session.last = { src = "script", titles = tt, conf = sa.strong and "high" or "low" }
 	session.scriptTurn = S.turns
-	return { text = text, meta = { ids = {}, topic = "script", src = "script" } }
+	return { text = text, meta = { ids = {}, topic = "script", src = "script", fam = sa.fam or (aa ~= a and fam) or nil } }
 end
 
 local RIGDEP = { reanim_r6_r15 = true, reanim_motor6d = true, reanim_sync = true, reanim_troubleshoot = true }
@@ -480,7 +483,7 @@ function Mind.decorate(a, r, res)
 		shown.verified = true
 		local rig = Memory.get("rig")
 		if rig and top and RIGDEP[top.id] then add[#add + 1] = "You're on " .. rig .. ", so the " .. rig .. " parts above are the ones that apply to you." end
-		if Script.ready() and a.intent ~= "code_request" and (a.topic == "reanim" or a.topic == "ui") then
+		if Script.ready() and a.intent ~= "code_request" and (a.topic == "reanim" or a.topic == "ui" or a.topic == "sec") then
 			local ok, ui = pcall(Script.findUI, a)
 			local t = ok and ui and ui[1]
 			if t and (t.exact or (t.cov >= 0.6 and t.m >= 2)) then

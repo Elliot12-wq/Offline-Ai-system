@@ -659,6 +659,7 @@ local function record(a, res)
 	cv.last = {
 		q = keep and keep.q or a.raw, terms = terms, topic = meta.topic or a.topic, ids = ids, src = src,
 		title = meta.title or (keep and keep.title), code = meta.code or (keep and keep.code), turn = cv.n, intent = a.intent,
+		fam = meta.fam or (keep and keep.fam),
 	}
 	if not a.follow then cv.lastq = { terms = a.terms, turn = cv.n } end
 end

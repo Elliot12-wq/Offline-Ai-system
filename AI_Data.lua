@@ -1,6 +1,7 @@
--- AI_Data: generated from a_very_cool_script_v291, updated for v300 (UI Cache switch) (UI map with per-control descriptions + Uh Admin / Nameless Admin command registry). Loaded lazily by AI_Script.
+-- AI_Data: rebuilt from Nooby's UH Modded Reanimation (UhhhhhhVersion V10, UHMergeBuild a_very_cool_script_v42, newest header revision v324): five reanimation methods, Extra Unanchored, Tool Reanimation Extras, full Security + External Script Protection map (UI map with per-control descriptions + Uh Admin / Nameless Admin command registry). Loaded lazily by AI_Script.
 local D = {}
-D.build = "v300"
+D.build = "v324"
+D.source = "Nooby's UH Modded Reanimation (UhhhhhhVersion V10, UHMergeBuild a_very_cool_script_v42, header revision v324)"
 -- ui line: Section|Path <US> Type(B button, S toggle/slider, D dropdown, T text box, L color picker) <US> Label <US> Description
 D.ui = [=====[
 Owner broadcast (owner only)|Main pageBSend announcementOwner only: sends the text you typed (max 200 characters) as an announcement to every user of the script.
@@ -26,7 +27,7 @@ Visual Effects (Roblox engine)|Main pageSFast Particle EffectsSets a Roblox f
 Visual Effects (Roblox engine)|Main pageBReload Render AssetsTells Roblox to reload its render assets, which can fix missing or stuck textures.
 Asset loading|Main pageSPreload Assets On LoadPreloads the game assets automatically when the game loads, so they stream in before you need them.
 Asset loading|Main pageBLoad Game AssetsPreloads the game assets right now.
-Reanimator|Main pageDReanimatorChooses the reanimation method: Limb Reanimator, Hats Reanimator, Tool Reanimation or Ragdoll Reanimator. The block right under it ("-=+ <method> Config +=-") shows the settings of the chosen method.
+Reanimator|Main pageDReanimatorChooses the reanimation method. Five methods: Limb Reanimator, Hats Reanimator, Tool Reanimation, Ragdoll Reanimator and Unanchored Reanimation. The block right under it ("-=+ <method> Config +=-") shows the settings of the chosen method.
 Reanimator|Main pageB* Reanimate *Starts the selected reanimation. While it runs the button becomes a stop button and the status line shows "Running: <method>"; pressing it again deanimates.
 Reanimator|Main pageBShow Reanimate HitboxesShows the hitboxes of your reanimated character (what the server sees). Only works while reanimated.
 Reanimator|Main pageBRefresh Reanimate CharacterRebuilds the reanimate character if it looks wrong.
@@ -37,7 +38,8 @@ Limb Reanimator config|Main page > Reanimator dropdown > Limb ReanimatorSShow 
 Limb Reanimator config|Main page > Reanimator dropdown > Limb ReanimatorSTarget Fling EnabledLets the reanimated character fling targets (Click Fling / Toggle Kill need this). Everyone you touch loses network ownership.
 Limb Reanimator config|Main page > Reanimator dropdown > Limb ReanimatorBCheck Limb CompatibilitySpawn a character first, then press it. It checks game animations, voice chat players, dynamic faces, the game environment and R6/R15 and tells you whether Limb Reanimator will work here.
 Limb Reanimator config|Main page > Reanimator dropdown > Limb ReanimatorBDump Fake Character State (console + clipboard)Copies a debug dump of the fake character to the console and clipboard, for bug reports.
-Ragdoll Reanimator config|Main page > Reanimator dropdown > Ragdoll ReanimatorLRagdoll StiffnessHow hard the ragdoll limbs are pulled toward the pose. Higher is stiffer. Applies on the next Reanimate. Ragdoll Reanimation detaches your real limbs into BallSocket ragdoll limbs and drives them to the reanimated pose; it also uses the Limb Reanimator settings. (Range 10-200.)
+Extra Unanchored Reanimation (Limb / Ragdoll)|Main page > Reanimator dropdown > Limb Reanimator or Ragdoll ReanimatorSExtra Unanchored ReanimationOff by default. Block "-=+ Extra Unanchored Reanimation +=-" at the bottom of the Limb and Ragdoll config. ON: while that Limb/Ragdoll reanimation runs, loose unanchored parts from the map become Wings, a Tail and a Halo Aura on your FAKE (reanimated) character, not on the real one. Parts are only moved once the engine confirms you simulate them. When ON it shows the same options as Unanchored Reanimation (Wings, Wing Animation, Tail, Tail Animation, Halo Aura, Part Finder, Automatic Part Search, Search Radius (studs), Teleport Confirmation) but not the tools/limbs switches or Torso Offset. It adds to Limb/Ragdoll reanimation; it is not the standalone Unanchored Reanimation method.
+Ragdoll Reanimator config|Main page > Reanimator dropdown > Ragdoll ReanimatorLRagdoll StiffnessHow hard the ragdoll limbs are pulled toward the pose. Higher is stiffer. Applies on the next Reanimate. Ragdoll Reanimation detaches your real limbs into BallSocket ragdoll limbs and drives them to the reanimated pose; it also uses the Limb Reanimator settings. (Range 10-200.) Ragdoll uses the Limb Reanimator settings below it, including Extra Unanchored Reanimation.
 Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorSPermadeath (dolteddown's pd)Uses dolteddown's permadeath so your real character stays dead while the hats are driven. Needs replicatesignal support from your executor.
 Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorSAuto Force Respawn when stuckIf the reanimate never finishes, respawns you automatically after the stuck timeout.
 Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorLStuck timeout (seconds)How long to wait before Auto Force Respawn kicks in. (Range 5-60.)
@@ -53,6 +55,11 @@ Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorSTool 
 Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorDtoolanim MethodTool animation style: Disabled or Sword.
 Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorBRebuild Hat MapUse it when your rig was built wrong or you switched to a new rig; it rebuilds which hat becomes which limb.
 Hats Reanimator config|Main page > Reanimator dropdown > Hats ReanimatorBForce Respawn NowRespawns you immediately without waiting for the stuck timeout.
+Tool Reanimation Extras (Hats)|Main page > Reanimator dropdown > Hats ReanimatorSAdd Tool Reanimation as ExtraOff by default. Block "-=+ Tool Reanimation Extras +=-" at the bottom of the Hats Reanimator config (Hats only). Master switch for cosmetic effects built from your SPARE Tool handles (never the tools in use). It is not Tool Reanimation itself: it does not replace your body parts. When ON the four effect switches appear below it.
+Tool Reanimation Extras (Hats)|Main page > Reanimator dropdown > Hats ReanimatorSWingsTool Extras effect (shown when Add Tool Reanimation as Extra is ON). Needs 6 spare tools. Not the same switch as Wings in Unanchored Reanimation, which uses loose map parts.
+Tool Reanimation Extras (Hats)|Main page > Reanimator dropdown > Hats ReanimatorSHaloTool Extras effect. Needs 3 spare tools.
+Tool Reanimation Extras (Hats)|Main page > Reanimator dropdown > Hats ReanimatorSTailTool Extras effect. Needs 4 spare tools. Not the same switch as Tail in Unanchored Reanimation.
+Tool Reanimation Extras (Hats)|Main page > Reanimator dropdown > Hats ReanimatorSFloating AuraTool Extras effect. Takes ALL the tools left after the other enabled effects. Effects are filled in order Wings, Halo, Tail, Floating Aura; if there are not enough spare tools the effect is skipped with a notification.
 Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationDTool MethodOriginal equips your tools, breaks the character's joints and drives the freed handles. Corpse Claim arms every tool, kills the real character so the server frees all grips together, then drives the tools.
 Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationSPermadeath (dolteddown's pd)Keeps your real character alive so the tools stay yours. Off means the tools are lost when the game respawns you.
 Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationSAuto Force Respawn when stuckRespawns you automatically if the reanimate never finishes.
@@ -60,6 +67,17 @@ Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationLStu
 Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationSTool CollideMakes the tool limbs collide with the world.
 Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationSTarget Fling EnabledEnables fling for tool reanimation; the biggest tool handle you own is thrown at fling targets.
 Tool Reanimation config|Main page > Reanimator dropdown > Tool ReanimationBForce Respawn NowRespawns you immediately.
+Unanchored Reanimation config|Main page > Reanimator dropdown > Unanchored ReanimationSUse unanchored parts as toolsOn by default. Loose unanchored map parts become Wings / Tail / Halo Aura (the tool-style handling). Off: those effects are not built from parts in the standalone or unanchored-limb run.
+Unanchored Reanimation config|Main page > Reanimator dropdown > Unanchored ReanimationSUse unanchored parts as limbsOff by default. On: pressing Reanimate (with Automatic Part Search on) asks whether to teleport to a suitable part, resets your character like the Limb Reanimator, and uses up to 6 parts (5, 4... if fewer exist) as the limbs of your reanimated character; one part is never used twice. This runs its own unanchored-limb lifecycle, not the Limb Reanimator.
+Unanchored Reanimation config|Main page > Reanimator dropdown > Unanchored ReanimationDTorso OffsetWhere your real root / torso is placed during an unanchored-limb run: Nooby's Method, RootPart Streamed, or RootPart in Sky/Void. (Unanchored Reanimation has its own Torso Offset; Hats Reanimator has a different one.)
+Unanchored Reanimation config|Main page > Reanimator dropdown > Unanchored ReanimationSWingsOn by default. Loose parts become Wings (targets up to 20 parts). Shows the Wing Animation dropdown when on.
+Unanchored Reanimation config|Main page > Reanimator dropdown > Unanchored ReanimationDWing AnimationFlap or Idle.
+Unanchored Reanimation config|Main page > Reanimator dropdown > Unanchored ReanimationSTailOn by default. Loose parts become a Tail (targets 6 parts). Shows the Tail Animation dropdown when on.
+Unanchored Reanimation config|Main page > Reanimator dropdown > Unanchored ReanimationDTail AnimationWag or Slash Tail.
+Unanchored Reanimation config|Main page > Reanimator dropdown > Unanchored ReanimationSHalo AuraOn by default. Loose parts orbit as a Halo Aura (targets 8 parts).
+Unanchored Reanimation config|Main page > Reanimator dropdown > Unanchored ReanimationSAutomatic Part SearchOn by default; the Part Finder block above it shows a "Detector:" status line (discovered / suitable / pending / acquired / attached / ownership lost). ON: the script looks for suitable unanchored parts within the Search Radius. OFF: no new parts are searched or claimed; parts already held keep animating.
+Unanchored Reanimation config|Main page > Reanimator dropdown > Unanchored ReanimationLSearch Radius (studs)Slider 20-500 studs (default 150), shown while Automatic Part Search is on.
+Unanchored Reanimation config|Main page > Reanimator dropdown > Unanchored ReanimationSTeleport ConfirmationOn by default, shown while Automatic Part Search is on. ON: a Yes / No prompt appears when a suitable part is out of reach and you are only teleported after pressing YES. OFF: no prompt and no teleport; only parts already in range are used.
 Reanimate Character Settings|Main pageSInfinite JumpLets the reanimated character jump again in mid-air.
 Reanimate Character Settings|Main pageSNoclipLets the reanimated character pass through walls and objects.
 Reanimate Character Settings|Main pageSSmooth CameraSmooths the camera while reanimated.
@@ -127,9 +145,18 @@ Live players|Main pageBDeanimateRemote moderation: stops the target's reanima
 Live players|Main pageBKickRemote moderation: kicks the target.
 Live players|Main pageBBanRemote moderation: bans the target.
 Live players|Main pageBUnbanRemote moderation: removes the ban from the target.
-Security|Main pageSBackground Malware ScanKeeps scanning downloaded content in the background for malicious code.
-Security|Main pageSAuto-Delete Malware (EXPERIMENTAL)Deletes anything the scan flags. Experimental: it can delete a safe file by mistake.
-Security|Main pageBScan NowRuns a malware scan right now.
+Security|Main pageSBackground Malware ScanOn by default. Quietly scans .lua / .luau / .txt files in UhhhhhhReanim/Modules and the executor workspace for malicious patterns (a new pass about every 5 minutes) and checks modules before they load. Skips Content / Muzik / Assets / Quarantine; the built-in modules are report-only. MALICIOUS modules are blocked at load, SUSPICIOUS ones only warn. Files over 6 MB are skipped; modules over 16 MB are blocked as unscannable. A clean result is not a guarantee of safety.
+Security|Main pageSAuto-Delete Malware (EXPERIMENTAL)Off by default. Only for MALICIOUS verdicts with confidence of at least 0.75 and not in report-only folders: the file is first copied to UhhhhhhReanim/Quarantine (the copy is read back and verified), then deleted. If the executor lacks writefile / readfile / isfile / delfile, the copy fails, or the file changed since the scan, it is kept in place. Experimental: it can delete a safe file by mistake.
+Security|Main pageBScan NowStarts a new background scan immediately (clears the scan cache). Needs Background Malware Scan on (otherwise it tells you to turn it on); if a scan is already running it says so.
+External Script Protection|Main pageSExternal Script ProtectionOn by default. Master switch for guarding third-party scripts (editor, clipboard, script hubs, ScriptBlox, GitHub, Pastebin, loadstring / loadfile). UH Admin's own scripts and the embedded Nameless Admin are not touched; an external copy of them is still checked. Turning any of the five protection switches OFF first shows a confirmation dialog (KEEP PROTECTION ON / TURN OFF PROTECTION); if the dialog cannot be shown, protection stays ON.
+External Script Protection|Main pageSAnti-PhishingOn by default. Analyses the web addresses found in third-party scripts (also decoded from escapes, string joins and base64): IP-logger domains, URL shorteners, look-alikes of Roblox domains, raw / obfuscated IP hosts, punycode, login or free-Robux lures. Judges the address text only; it follows no redirects.
+External Script Protection|Main pageSScript CheckerOn by default. Inspects third-party script source before it runs and gives CLEAN, SUSPICIOUS, MALICIOUS or UNVERIFIED. UNVERIFIED means the source could not be inspected (unreadable, over 4 MB, analysis failed, or compiled by the executor first). CLEAN only means no known pattern was found.
+External Script Protection|Main pageSExecution FirewallOn by default. Pauses a flagged script (SUSPICIOUS / MALICIOUS / UNVERIFIED) with an EXECUTION PAUSED panel; running it needs two typed confirmations (I UNDERSTAND THE SECURITY RISKS, then RUN ANYWAY) or you press BLOCK; no answer in 120 s means blocked. Critical threats can never be overridden. File execution (loadfile / dofile) that is UNVERIFIED is blocked. With the firewall OFF, MALICIOUS scripts are still blocked and others run without a prompt.
+External Script Protection|Main pageSRuntime MonitoringOn by default. Watches what third-party scripts do while running through guarded functions: HTTP requests, clipboard read/write, file writes and deletes, queue_on_teleport, and attempts to replace or restore the guarded hooks. Only calls that go through those guarded functions are seen.
+External Script Protection|Main pageBSecurity FindingsToggles the findings panel (latest 6): severity, script id and name, verdict, origin, decision and evidence with line numbers.
+External Script Protection|Main pageBSecurity HistoryToggles the history log (latest 12): scans, blocks, decisions, confirmations, setting changes and runtime events.
+External Script Protection|Main pageBExecutor Capabilities & LimitsShows what this executor can intercept (loadstring, HTTP, __namecall colon-calls, file and clipboard functions, hookfunction) marked OK / PARTIAL / NOT INTERCEPTABLE / N/A, plus the known limits of the protection. Not every executor supports every interception.
+External Script Protection|Main pageBClear Findings & HistoryEmpties the findings and history lists (the statistics block stays).
 Security|Main pageBCLEAR ALL DOWNLOADED CONTENTDANGER ZONE. Deletes everything the script downloaded (needs repeated clicks to confirm) and reloads modules.
 Color system|Main page > CustomizationDAccent modeHow the UI accent color is chosen (picked color, harmony, aurora, music-driven and more).
 Color system|Main page > CustomizationDColor harmony (secondary + tertiary colors)How the secondary and tertiary colors are derived from the accent.
@@ -269,6 +296,9 @@ Limb Reanimator configReanimation / Character
 Ragdoll Reanimator configReanimation / Character
 Hats Reanimator configReanimation / Character
 Tool Reanimation configReanimation / Character
+Unanchored Reanimation configReanimation / Character
+Extra Unanchored Reanimation (Limb / Ragdoll)Reanimation / Character
+Tool Reanimation Extras (Hats)Reanimation / Character
 Reanimate Character SettingsReanimation / Character
 Fly & WalkSpeedReanimation / Character
 PerformancePerformance / Graphics
@@ -281,6 +311,7 @@ MarketplaceMarketplace
 Modules managementScript Hub / Modules
 Live playersLive Players / Moderation
 SecuritySecurity / Danger Zone
+External Script ProtectionSecurity / Danger Zone
 Color systemCustomization
 TriangleCustomization
 Intro (customization)Customization

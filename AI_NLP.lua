@@ -14,7 +14,7 @@ local STOP = set({
 	"isnt", "thanks", "thank", "show", "give", "let", "lets", "can't", "u", "ur", "im", "ill", "id",
 })
 
-local SYN = { gui = "ui", interface = "ui", reanim = "reanimat" }
+local SYN = { gui = "ui", interface = "ui", reanim = "reanimat", ua = "unanchor", uar = "unanchor", antiphish = "phish", phishing = "phish" }
 local EXC = { string = "string", strings = "string", class = "class", classes = "class", process = "process" }
 
 local function stem(w)
@@ -85,6 +85,8 @@ addTopic("reanim", { "reanimate", "reanimation", "reanim", "humanoid", "joint", 
 	"replicate", "replication", "physics", "weld", "fling", "velocity", "simulation", "heartbeat", "fake", "clone", "torso", "humanoidrootpart",
 	"neck", "shoulder", "hip", "accessory", "respawn", "anchored", "massless", "collision" }, 1)
 addTopic("reanim", { "r6", "r15", "motor6d", "cframe", "reanimate", "reanimation", "reanim", "humanoidrootpart", "ownership", "replication" }, 2)
+addTopic("reanim", { "unanchored", "ragdoll", "wings", "halo", "aura", "tail", "unanchor" }, 1)
+addTopic("reanim", { "unanchored", "unanchor" }, 2)
 addTopic("luau", { "luau", "lua", "variable", "function", "table", "loop", "metatable", "metamethod", "coroutine", "task", "pcall",
 	"xpcall", "debug", "error", "module", "modulescript", "require", "string", "array", "dictionary", "closure", "oop", "class", "local",
 	"nil", "ipairs", "pairs", "script", "scope", "return", "parameter", "argument", "vararg", "insert", "sort", "print", "warn", "typeof",
@@ -93,6 +95,7 @@ addTopic("luau", { "luau", "metatable", "coroutine", "pcall", "closure", "module
 addTopic("luau", { "remote", "remoteevent", "remotefunction", "heartbeat", "runservice", "raycast", "datastore", "collectionservice", "attribute", "userinputservice", "localscript", "strict", "client", "server" }, 1)
 addTopic("sec", { "vulnerability", "vulnerable", "exploit", "exploiter", "exploiting", "security", "secure", "anticheat", "validate", "validation", "sanity", "cheat", "cheater", "ownership", "networkowner", "disclosure", "protect", "weakness" }, 1)
 addTopic("sec", { "vulnerability", "exploiter", "anticheat", "validation", "sanity" }, 2)
+addTopic("sec", { "malware", "phishing", "firewall", "quarantine", "malicious", "suspicious", "unverified" }, 1)
 addTopic("help", { "help", "assist", "support", "troubleshoot", "beginner", "teach", "tutorial", "learn", "stuck", "newbie", "noob", "guide", "report", "bug", "checklist" }, 1)
 
 local function detectTopic(terms)
